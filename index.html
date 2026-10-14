@@ -45,7 +45,7 @@ input[type=date]{-webkit-appearance:none;appearance:none;display:block;min-width
 input[type=date]::-webkit-date-and-time-value{text-align:left}
 </style></head><body><div id="app"><main id="main"></main><nav id="nav"></nav></div>
 <script>
-const VER=3;
+const VER=4;
 const $=s=>document.querySelector(s),pad=n=>String(n).padStart(2,'0');
 let S={};try{S=JSON.parse(localStorage.getItem('bp')||'{}')}catch(e){}
 S.ov=S.ov||{};S.done=S.done||{};S.wt=S.wt||[];S.kit=S.kit||{};S.cfg=S.cfg||{club:2,price:0};
@@ -86,13 +86,13 @@ function plan0(d){const t=type(d),w=d.getDay(),pv=type(addD(d,-1))=='N',nx=type(
  return L}
 const today=()=>{const n=new Date();return new Date(n.getFullYear(),n.getMonth(),n.getDate())};
 let tab=S.me?'today':'prog',sel=today(),cm={y:sel.getFullYear(),m:sel.getMonth()},edit=false;
-function vToday(){const t=type(sel),m=M[t],k=key(sel),P=plan(sel),n=P.filter((p,i)=>S.done[k+'|'+i]).length,isT=k==key(today());
+function vToday(){const t=type(sel),m=M[t],k=key(sel),P=plan(sel),n=P.filter((p,i)=>S.done[k+'|'+p.id]).length,isT=k==key(today());
  return`<div class="row"><button class="ic" onclick="mv(-1)">‹</button><div class="c"><h1>${isT?'Today':sel.toLocaleDateString('en-GB',{weekday:'long'})}</h1><small style="color:var(--mut)">${sel.toLocaleDateString('en-GB',{day:'numeric',month:'long'})}</small></div><button class="ic" onclick="mv(1)">›</button></div>
  <div class="banner ${t}"><span>${m[0]}</span><div><b>${m[1]}</b><small>${m[2]}</small></div></div>
- <p style="color:var(--mut);margin:10px 0 0">💡 ${TIPS[Math.floor(sel.getTime()/864e5)%TIPS.length]}</p>${ME().hurt?`<p style="margin:6px 0 0">⚠️ Protect: ${ME().hurt}. Skip or lighten any move that hurts.</p>`:''}<h2>Plan · ${n}/${P.length} done</h2>${P.map((p,i)=>`<label class="it${S.done[k+'|'+i]?' dn':''}"><input type="checkbox" ${S.done[k+'|'+i]?'checked':''} onchange="tg('${k}|${i}')"><i>${p.i}</i><div><b>${p.t}</b>${p.cl?'<span class="pill">Club</span>':p.tr?'<span class="pill">Train</span>':''}<p>${p.x}</p>${p.mv&&p.mv.length?`<button class="chip" style="margin-top:6px" onclick="om('${k}|${i}')">${OM[k+'|'+i]?'Hide':'Show'} moves ▾</button>`:''}</div></label>${p.mv&&p.mv.length&&OM[k+'|'+i]?p.mv.map(mvCard).join(''):''}`).join('')}
+ <p style="color:var(--mut);margin:10px 0 0">💡 ${TIPS[Math.floor(sel.getTime()/864e5)%TIPS.length]}</p>${ME().hurt?`<p style="margin:6px 0 0">⚠️ Protect: ${ME().hurt}. Skip or lighten any move that hurts.</p>`:''}<h2>Plan · ${n}/${P.length} done</h2>${P.map((p,i)=>`<label class="it${S.done[k+'|'+p.id]?' dn':''}"><input type="checkbox" ${S.done[k+'|'+p.id]?'checked':''} onchange="tg('${k}|${p.id}')"><i>${p.i}</i><div><b>${p.t}</b>${p.cl?'<span class="pill">Club</span>':p.tr?'<span class="pill">Train</span>':''}<p>${p.x}</p>${p.mv&&p.mv.length?`<button class="chip" style="margin-top:6px" onclick="om('${k}|${p.id}')">${OM[k+'|'+p.id]?'Hide':'Show'} moves ▾</button>`:''}</div></label>${p.mv&&p.mv.length&&OM[k+'|'+p.id]?p.mv.map(mvCard).join(''):''}`).join('')}
  <h2>Daily basics</h2>${H.map((h,i)=>`<label class="it${S.done[k+'|h'+i]?' dn':''}"><input type="checkbox" ${S.done[k+'|h'+i]?'checked':''} onchange="tg('${k}|h${i}')"><div>${h}</div></label>`).join('')}`}
 function vCal(){const{y,m}=cm,off=(new Date(y,m,1).getDay()+6)%7,dim=new Date(y,m+1,0).getDate(),c={D:0,N:0,V:0},tk=key(today());let g='<i></i>'.repeat(off);
- for(let d=1;d<=dim;d++){const dt=new Date(y,m,d),t=type(dt),k=key(dt);if(c[t]!=null)c[t]++;const dn=plan(dt).some((p,i)=>p.tr&&S.done[k+'|'+i]);g+=`<button class="cd ${t}${k==tk?' td':''}" onclick="pick(${y},${m},${d})">${d}<span>${t=='O'?'':M[t][0]}</span>${dn?'<u></u>':''}</button>`}
+ for(let d=1;d<=dim;d++){const dt=new Date(y,m,d),t=type(dt),k=key(dt);if(c[t]!=null)c[t]++;const dn=plan(dt).some((p,i)=>p.tr&&S.done[k+'|'+p.id]);g+=`<button class="cd ${t}${k==tk?' td':''}" onclick="pick(${y},${m},${d})">${d}<span>${t=='O'?'':M[t][0]}</span>${dn?'<u></u>':''}</button>`}
  return`<div class="row"><button class="ic" onclick="cmv(-1)">‹</button><div class="c"><h1>${new Date(y,m,1).toLocaleDateString('en-GB',{month:'long',year:'numeric'})}</h1></div><button class="ic" onclick="cmv(1)">›</button></div>
  <div class="chips"><span class="chip">☀️ ${c.D}</span><span class="chip">🌙 ${c.N}</span><span class="chip">🏖️ ${c.V}</span></div>
  <div class="grid">${'Mo Tu We Th Fr Sa Su'.split(' ').map(x=>`<div>${x}</div>`).join('')}${g}</div>
@@ -113,9 +113,9 @@ setInterval(()=>{if(!T.run)return;const l=T.end-Date.now();if(l<=0)nx();else{if(
 function pre(i){T.r=PR[i][1];T.w=PR[i][2];T.s=PR[i][3];T.run=0;T.ph='idle';render()}
 function upd(){const e=$('#tm');if(!e)return;const ms=T.run?T.end-Date.now():T.ph=='idle'?T.w*1000:T.left,s=Math.max(0,Math.ceil(ms/1000));e.textContent=pad(Math.floor(s/60))+':'+pad(s%60);$('#ph').textContent={idle:'Ready',prep:'Get ready',work:'Fight!',rest:'Rest',done:'Done 🔔'}[T.ph];$('#rd').textContent=T.ph=='idle'?T.r+' rounds':'Round '+T.i+' / '+T.r;$('#tb').className='tb '+T.ph;$('#go').textContent=T.run?'Pause':'Start'}
 function vProg(){const n=today(),mon=addD(n,-((n.getDay()+6)%7));let wk=0,mo=0,cl=0;
- for(let i=0;i<30;i++){const dt=addD(n,-i),k=key(dt),c=plan(dt).filter((p,j)=>p.tr&&S.done[k+'|'+j]).length;mo+=c;cl+=plan(dt).filter((p,j)=>p.cl&&S.done[k+'|'+j]).length;if(dt>=mon)wk+=c}
+ for(let i=0;i<30;i++){const dt=addD(n,-i),k=key(dt),c=plan(dt).filter((p,j)=>p.tr&&S.done[k+'|'+p.id]).length?1:0;mo+=c;cl+=plan(dt).filter((p,j)=>p.cl&&S.done[k+'|'+p.id]).length;if(dt>=mon)wk+=c}
  const w=S.wt,d=w.length>1?(w[w.length-1].kg-w[0].kg).toFixed(1):null;
- return`<h2>Progress</h2><div class="big"><div><b>${wk}/${ME().days||5}</b><span>sessions this week</span></div><div><b>${mo}</b><span>sessions, last 30 days</span></div></div>
+ return`<h2>Progress</h2><div class="big"><div><b>${wk}/${ME().days||5}</b><span>training days this week</span></div><div><b>${mo}</b><span>training days, last 30 days</span></div></div>
  <h2>Club budget</h2><div class="fs" style="grid-template-columns:1fr 1fr"><div><label>Club sessions per week</label><input type="number" min="0" max="5" value="${S.cfg.club}" onchange="S.cfg.club=Math.min(5,Math.max(0,+this.value||0));save();render()"></div><div><label>Price per session (₽)</label><input type="number" value="${S.cfg.price||''}" onchange="S.cfg.price=+this.value||0;save();render()"></div></div><p style="color:var(--mut)">Planned: ${S.cfg.club} per week${S.cfg.price?' = '+S.cfg.club*S.cfg.price+' ₽':''}<br>Attended, last 30 days: ${cl}${S.cfg.price?' = '+cl*S.cfg.price+' ₽':''}</p><h2>Body weight</h2><div class="row"><input type="number" step="0.1" id="kg" placeholder="kg" style="flex:1"><button class="btn" onclick="aw()">Add</button></div>
  <p style="color:var(--mut)">${w.length?w.slice(-6).reverse().map(x=>x.d.slice(5)+': '+x.kg+' kg').join(' · ')+(d!==null?'<br>Change since first entry: '+(d>0?'+':'')+d+' kg':''):'Weigh yourself in the morning, same conditions each time.'}</p>
  <h2>Boxing bag checklist</h2>${KIT.map((k,i)=>`<label class="kit"><input type="checkbox" ${S.kit[i]?'checked':''} onchange="S.kit[${i}]=this.checked;save()">${k}</label>`).join('')}
@@ -139,7 +139,8 @@ let OM={},CB='';const om=k=>{OM[k]=!OM[k];render()};
 function mvCard(id){const m=MV[id],sp=ME().st=='s';return`<div class="mc"><div style="${sp?'transform:scaleX(-1)':''}">${fig(m.p,m.t,m.x)}</div><b>${m.e} ${m.n}</b><p style="margin:2px 0;color:var(--mut)">${m.w}</p><ol>${m.s.map(x=>`<li>${x}</li>`).join('')}</ol><p style="margin:2px 0">⚠️ ${m.m}</p><p style="margin:2px 0">⏱️ ${m.d}</p><a class="chip" style="display:inline-block;margin-top:8px;text-decoration:none;color:var(--ink)" target="_blank" rel="noopener" href="https://www.youtube.com/results?search_query=${encodeURIComponent(m.q)}">▶ Watch video</a></div>`}
 const vMoves=()=>`<h1>Moves</h1><p style="color:var(--mut)">Animated guides for your sessions. Southpaw? Set your stance in Me and the figures mirror.</p><div class="mc"><b>🎲 Combo generator</b><p style="font:800 28px system-ui;margin:6px 0">${CB||'Tap the button'}</p><p style="color:var(--mut);margin:0 0 8px">1 jab · 2 cross · 3 lead hook · 4 rear hook · 5 lead uppercut · 6 rear uppercut</p><button class="btn" onclick="CB=Array.from({length:3+Math.floor(Math.random()*3)},()=>1+Math.floor(Math.random()*6)).join(' – ');render()">New combo</button></div>${Object.keys(MV).map(mvCard).join('')}`;
 const CLS=[48,51,54,57,60,63.5,67,71,75,80,86,92];
-function plan(d){const L=plan0(d),m=ME(),r={b:3,a:6}[m.lv]||5;
+const hs=t=>{let x=0;for(const c of t)x=(x*31+c.charCodeAt(0))|0;return(x>>>0).toString(36)};
+function plan(d){const L=plan0(d),m=ME(),r={b:3,a:6}[m.lv]||5,seen={};L.forEach(p=>{const b=hs(p.t+p.i+p.x.slice(0,14)),n=seen[b]=(seen[b]||0)+1;p.id=n>1?b+'_'+n:b});
  L.forEach(p=>{p.x=p.x.replace('shadowboxing 5 × 3','shadowboxing '+r+' × 3');if(m.eq&&m.eq.bag&&p.x.startsWith('Technique at home'))p.x+=' + heavy bag 4 × 3 min';if(m.eq&&!m.eq.bar)p.x=p.x.replace('3 × 8 pull-ups','3 × 12 backpack rows')});return L}
 function vMe(){const m=ME(),eq=m.eq||{},sel=(k,o)=>`<select onchange="sm('${k}',this.value);render()">${o.map(([v,l])=>`<option value="${v}"${(m[k]||'')==v?' selected':''}>${l}</option>`).join('')}</select>`,inp=(k,l,t,ph)=>`<label>${l}</label><input type="${t||'number'}" ${(t||'number')=='number'?'inputmode="decimal"':''} value="${m[k]||''}" placeholder="${ph||''}" onchange="sm('${k}',this.value);render()">`;
  const cls=m.kg?(CLS.find(c=>c>=+m.kg)||'92+'):null,left=m.fd?Math.ceil((new Date(m.fd+'T00:00')-today())/864e5):null;
@@ -156,6 +157,7 @@ const go=k=>{tab=k;$('#main').scrollTop=0;render()},mv=n=>{sel=addD(sel,n);rende
 function cmv(n){cm.m+=n;if(cm.m<0){cm.m=11;cm.y--}if(cm.m>11){cm.m=0;cm.y++}render()}
 function pick(y,m,d){const dt=new Date(y,m,d);if(edit){const o=['D','N','O','V'];S.ov[key(dt)]=o[(o.indexOf(type(dt))+1)%4];save();render()}else{sel=dt;go('today')}}
 function aw(){const v=parseFloat($('#kg').value);if(!v)return;const k=key(today());S.wt=S.wt.filter(x=>x.d!=k);S.wt.push({d:k,kg:v});S.wt.sort((a,b)=>a.d<b.d?-1:1);save();render()}
+(function(){const o=S.done,n={};for(const k in o){if(!o[k])continue;const m=k.match(/^(\d{4})-(\d\d)-(\d\d)\|(\d+)$/);if(m){const q=plan(new Date(+m[1],+m[2]-1,+m[3]))[+m[4]];if(q)n[k.slice(0,10)+'|'+q.id]=1}else n[k]=1}S.done=n;save()})();
 render();
 fetch('index.html?'+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{const m=t.match(/const VER=(\d+)/);if(m&&+m[1]>VER&&!location.search.includes('v='+m[1]))location.replace(location.pathname+'?v='+m[1])}).catch(()=>{});
 </script></body></html>
