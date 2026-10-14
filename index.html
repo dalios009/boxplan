@@ -39,6 +39,7 @@ input[type=number]{width:100%;padding:10px;border-radius:10px;border:1px solid v
 .kit{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}.kit input{accent-color:var(--acc);width:20px;height:20px}
 </style></head><body><div id="app"><main id="main"></main><nav id="nav"></nav></div>
 <script>
+const VER=1;
 const $=s=>document.querySelector(s),pad=n=>String(n).padStart(2,'0');
 let S={};try{S=JSON.parse(localStorage.getItem('bp')||'{}')}catch(e){}
 S.ov=S.ov||{};S.done=S.done||{};S.wt=S.wt||[];S.kit=S.kit||{};S.cfg=S.cfg||{club:2,price:0};
@@ -112,7 +113,7 @@ function vProg(){const n=today(),mon=addD(n,-((n.getDay()+6)%7));let wk=0,mo=0,c
  <h2>Club budget</h2><div class="fs" style="grid-template-columns:1fr 1fr"><div><label>Club sessions per week</label><input type="number" min="0" max="5" value="${S.cfg.club}" onchange="S.cfg.club=Math.min(5,Math.max(0,+this.value||0));save();render()"></div><div><label>Price per session (₽)</label><input type="number" value="${S.cfg.price||''}" onchange="S.cfg.price=+this.value||0;save();render()"></div></div><p style="color:var(--mut)">Planned: ${S.cfg.club} per week${S.cfg.price?' = '+S.cfg.club*S.cfg.price+' ₽':''}<br>Attended, last 30 days: ${cl}${S.cfg.price?' = '+cl*S.cfg.price+' ₽':''}</p><h2>Body weight</h2><div class="row"><input type="number" step="0.1" id="kg" placeholder="kg" style="flex:1"><button class="btn" onclick="aw()">Add</button></div>
  <p style="color:var(--mut)">${w.length?w.slice(-6).reverse().map(x=>x.d.slice(5)+': '+x.kg+' kg').join(' · ')+(d!==null?'<br>Change since first entry: '+(d>0?'+':'')+d+' kg':''):'Weigh yourself in the morning, same conditions each time.'}</p>
  <h2>Boxing bag checklist</h2>${KIT.map((k,i)=>`<label class="kit"><input type="checkbox" ${S.kit[i]?'checked':''} onchange="S.kit[${i}]=this.checked;save()">${k}</label>`).join('')}
- <h2>Shift calendar</h2><button class="btn g" onclick="if(confirm('Remove all manual shift edits?')){S.ov={};save();render()}">Reset my edits</button>`}
+ <h2>App version</h2><p style="color:var(--mut)">Version ${VER}. The app checks for updates each time you open it.</p><button class="btn g" onclick="location.replace(location.pathname+'?r='+Date.now())">Reload latest version</button><h2>Shift calendar</h2><button class="btn g" onclick="if(confirm('Remove all manual shift edits?')){S.ov={};save();render()}">Reset my edits</button>`}
 function render(){const m=$('#main'),st=m.scrollTop;m.innerHTML={today:vToday,cal:vCal,timer:vTimer,prog:vProg}[tab]();m.scrollTop=st;upd();
  $('#nav').innerHTML=[['today','🏠','Today'],['cal','🗓️','Calendar'],['timer','⏱️','Timer'],['prog','📈','Progress']].map(([k,e,l])=>`<button class="${tab==k?'on':''}" onclick="go('${k}')"><b>${e}</b>${l}</button>`).join('')}
 const go=k=>{tab=k;$('#main').scrollTop=0;render()},mv=n=>{sel=addD(sel,n);render()},tg=k=>{S.done[k]=!S.done[k];save();render()};
@@ -120,4 +121,5 @@ function cmv(n){cm.m+=n;if(cm.m<0){cm.m=11;cm.y--}if(cm.m>11){cm.m=0;cm.y++}rend
 function pick(y,m,d){const dt=new Date(y,m,d);if(edit){const o=['D','N','O','V'];S.ov[key(dt)]=o[(o.indexOf(type(dt))+1)%4];save();render()}else{sel=dt;go('today')}}
 function aw(){const v=parseFloat($('#kg').value);if(!v)return;const k=key(today());S.wt=S.wt.filter(x=>x.d!=k);S.wt.push({d:k,kg:v});S.wt.sort((a,b)=>a.d<b.d?-1:1);save();render()}
 render();
+fetch('index.html?'+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{const m=t.match(/const VER=(\d+)/);if(m&&+m[1]>VER&&!location.search.includes('v='+m[1]))location.replace(location.pathname+'?v='+m[1])}).catch(()=>{});
 </script></body></html>
