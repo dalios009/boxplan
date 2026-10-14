@@ -41,7 +41,7 @@ input[type=number]{width:100%;padding:10px;border-radius:10px;border:1px solid v
 <script>
 const $=s=>document.querySelector(s),pad=n=>String(n).padStart(2,'0');
 let S={};try{S=JSON.parse(localStorage.getItem('bp')||'{}')}catch(e){}
-S.ov=S.ov||{};S.done=S.done||{};S.wt=S.wt||[];S.kit=S.kit||{};
+S.ov=S.ov||{};S.done=S.done||{};S.wt=S.wt||[];S.kit=S.kit||{};S.cfg=S.cfg||{club:2,price:0};
 const save=()=>{try{localStorage.setItem('bp',JSON.stringify(S))}catch(e){}};
 const key=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
 const addD=(d,n)=>new Date(d.getFullYear(),d.getMonth(),d.getDate()+n);
@@ -57,20 +57,32 @@ const S1=[['19:30','Спорт-группа, Fedoseev']],CL=[[['12:00','Обща
 const AM=['Active recovery: 30 min walk + 20 min stretching','Easy run 35–40 min + 10 min core (plank, leg raises)','Strength A, 45 min: squats, push-ups, rows, lunges, plank. 4 rounds','Intervals: 8 × (30 s sprint / 90 s walk), then rope 5 × 3 min','Strength B, 45 min: deadlifts, pull-ups, med-ball slams, core','Tempo run 25 min + shadowboxing 4 × 3 min','Rope 3 × 3 min + shadowboxing 3 × 3 min + mobility'];
 const SH=['Rope 5 × 3 min + shadowboxing 3 × 3 min + core 5 min','Easy run 25 min + 3 × 15 push-ups + 3 × 8 pull-ups'];
 const H=['💧 2.5 L water','🥩 Protein in every meal','🧘 10 min stretching','😴 Sleep 7 h or more'];
-const KIT=['Gloves 12–16 oz','Hand wraps','Mouthguard','Jump rope','Boxing shoes','Headgear (for sparring)','Medical certificate (справка)','Towel + water bottle'];
-function plan(d){const t=type(d),w=d.getDay(),pv=type(addD(d,-1))=='N',nx=type(addD(d,1)),L=[],a=(t,i,x,tr)=>L.push({t,i,x,tr});
- const club=()=>CL[w].forEach(c=>a(c[0],'🥊',c[1]+(pv&&c[0]<'15'?'. After a night shift go only if you slept 4 h+':''),1));
- if(t=='D'){a('06:00','⏰','Wake up, 500 ml water, light breakfast (oats, eggs, fruit)');a('06:30','🏃',SH[d.getDate()%2]+' (30–40 min)',1);a('08:15','🎒','Pack food: protein, fruit, nuts and 2 L water');a('13:00','🍽️','Mid-shift meal: protein + carbs, nothing heavy or fried');a('21:30','🧘','Home: 10 min stretching, light dinner, shower');a(nx=='D'?'22:30':'23:30','😴',nx=='D'?'Lights out. Early start tomorrow':'Lights out. 7+ hours of sleep')}
- else if(t=='N'){if(pv)a('09:30','😴','Back from the night: light meal, sleep 10:00–16:30 in a dark room');else a('13:00','😴','Nap 90 min (13:00–14:30) to prepare for the night');a('17:30','🥊','Light session 30–40 min: shadowboxing 4 × 3, rope 3 × 3, bodyweight circuit. Moderate, no max effort',1);a('19:00','🍽️','Main meal: carbs + protein, keep it moderate');a('20:15','🎒','Leave with water, fruit, nuts, protein bar');a('01:00','🥜','Night snack: banana, nuts or yogurt. No caffeine after 03:00');a('09:00','🏁','Shift ends: easy breakfast, then sleep')}
- else if(t=='V'){a('06:30','⏰','Wake up, water, breakfast');a('07:15','🏃',AM[w],1);a('10:30','🍽️','Snack: protein + carbs');if(key(d)=='2026-10-15')a('12:00','📍','Visit МОСБОКС Коломенская (Нагатинская 34): meet Fedoseev, ask for a trial in the Спорт-группа');a('15:30','🥊','Technique homework 20 min: jab–cross, footwork, defence in front of a mirror, 3 × 3 min',1);club();a('22:30','😴','Sleep 8 h. Recovery is training')}
- else{if(pv){a('09:30','😴','Sleep 10:00–16:00. Recovery comes first');a('16:30','🍽️','Big meal: protein + carbs');a('17:15','🧘','Mobility 15 min: hips, shoulders, neck')}else{a('08:00','🏃',AM[w],1);a('10:00','🍽️','Breakfast: protein + carbs')}club();if(nx=='N')a('13:00','😴','Night shift tomorrow: nap 60–90 min, keep late training light');if(nx=='D')a('22:30','😴','Early start tomorrow: in bed by 22:30')}
+const KIT=['Gloves 12–16 oz','Hand wraps','Mouthguard','Jump rope','Boxing shoes','Headgear (for sparring)','Medical certificate (справка)','Towel, shower kit, flip-flops, clean clothes','Water bottle'];
+const NS='Shadowboxing 4 × 3 min + rope 3 × 3 min + bodyweight circuit',TECH='Technique at home, 30 min: shadowboxing 5 × 3 min (jab–cross, footwork, defence)';
+const fm=m=>pad(Math.floor(m/60)%24)+':'+pad(m%60),tm=s=>+s.slice(0,2)*60+ +s.slice(3);
+const PREF=[4,6,2,1,3,5,0];
+function clubOn(d){const w=d.getDay(),mon=addD(d,-((w+6)%7)),c=[];
+ for(let i=0;i<7;i++){const x=addD(mon,i),t=type(x),wd=x.getDay();if((t=='O'||t=='V')&&!(type(addD(x,-1))=='N'&&CL[wd][0][0]<'15'))c.push(wd)}
+ c.sort((a,b)=>PREF.indexOf(a)-PREF.indexOf(b));return c.slice(0,S.cfg.club).includes(w)}
+function plan(d){const t=type(d),w=d.getDay(),pv=type(addD(d,-1))=='N',nx=type(addD(d,1)),L=[],a=(t,i,x,tr,cl)=>L.push({t,i,x,tr,cl});
+ const cb=()=>{const s=tm(CL[w][0][0]),nm=CL[w].map(c=>c[1]).join(' / ');a(fm(s-150),'🍌','Light meal 2 h before: rice or pasta + banana');a(fm(s-75),'🚌','Leave home (1 h to the club). Bag: gloves, wraps, mouthguard, towel, shower kit, clean clothes');a(fm(s),'🥊',nm+', about 90 min',1,1);a(fm(s+90),'🚿','Shower and change at the club (about 20 min)');a(fm(s+110),'🚌','Travel home (1 h), protein meal when you arrive')};
+ if(t=='D'){a('05:45','⏰','Wake up, 500 ml water, light breakfast');a('06:00','🏃',SH[d.getDate()%2]+' (40 min)',1);a('06:50','🚿','Shower at home, get ready');a('07:45','🚌','Leave home (1 h to work)');a('13:00','🍽️','Mid-shift meal: protein + carbs, nothing heavy or fried');a('21:00','🏁','Shift ends. Travel home (1 h)');a('22:10','🧘','Dinner + 10 min stretching');a(nx=='D'?'22:45':'23:30','😴',nx=='D'?'Lights out, early start tomorrow':'Lights out, 7+ hours of sleep')}
+ else if(t=='N'){if(pv){a('09:00','🏁','Shift ends. Travel home (1 h)');a('10:15','😴','Light meal, shower, sleep 10:45–17:00 in a dark room');a('17:15','🥊',NS+' (40 min, moderate)',1);a('18:15','🚿','Shower, then main meal')}else{a('13:30','😴','Nap 90 min to prepare for the night');a('16:00','🥊',NS+' (40 min, moderate)',1);a('16:50','🚿','Shower, then main meal')}a('19:45','🚌','Leave home (1 h to work). Pack water, fruit, nuts, protein bar');a('01:00','🥜','Night snack: banana, nuts or yogurt. No caffeine after 03:00')}
+ else{const club=clubOn(d);
+  if(pv)a('09:30','😴','Sleep 10:00–16:00. Recovery comes first');
+  else{a(t=='V'?'07:30':'08:00','🏃',AM[w]+(club?'. Keep it easy, club today':''),w!=0);a('09:30','🚿','Shower, breakfast: protein + carbs')}
+  if(club)cb();
+  else if(w==0&&!pv)a('17:30','🧘','Rest day: 30 min walk, stretching, meal prep');
+  else a('17:30','🥊',pv?'Light home session: shadowboxing 3 × 3 min + rope 3 × 3 min + mobility':TECH,1);
+  if(nx=='N')a('23:59','😴','Night shift tomorrow: go to bed late (00:30) and sleep in');
+  else a(nx=='D'?'22:30':'23:30','😴',nx=='D'?'In bed by 22:30, early start tomorrow':'Lights out, 7+ hours of sleep')}
  return L}
 const today=()=>{const n=new Date();return new Date(n.getFullYear(),n.getMonth(),n.getDate())};
 let tab='today',sel=today(),cm={y:sel.getFullYear(),m:sel.getMonth()},edit=false;
 function vToday(){const t=type(sel),m=M[t],k=key(sel),P=plan(sel),n=P.filter((p,i)=>S.done[k+'|'+i]).length,isT=k==key(today());
  return`<div class="row"><button class="ic" onclick="mv(-1)">‹</button><div class="c"><h1>${isT?'Today':sel.toLocaleDateString('en-GB',{weekday:'long'})}</h1><small style="color:var(--mut)">${sel.toLocaleDateString('en-GB',{day:'numeric',month:'long'})}</small></div><button class="ic" onclick="mv(1)">›</button></div>
  <div class="banner ${t}"><span>${m[0]}</span><div><b>${m[1]}</b><small>${m[2]}</small></div></div>
- <h2>Plan · ${n}/${P.length} done</h2>${P.map((p,i)=>`<label class="it${S.done[k+'|'+i]?' dn':''}"><input type="checkbox" ${S.done[k+'|'+i]?'checked':''} onchange="tg('${k}|${i}')"><i>${p.i}</i><div><b>${p.t}</b>${p.tr?'<span class="pill">Train</span>':''}<p>${p.x}</p></div></label>`).join('')}
+ <h2>Plan · ${n}/${P.length} done</h2>${P.map((p,i)=>`<label class="it${S.done[k+'|'+i]?' dn':''}"><input type="checkbox" ${S.done[k+'|'+i]?'checked':''} onchange="tg('${k}|${i}')"><i>${p.i}</i><div><b>${p.t}</b>${p.cl?'<span class="pill">Club</span>':p.tr?'<span class="pill">Train</span>':''}<p>${p.x}</p></div></label>`).join('')}
  <h2>Daily basics</h2>${H.map((h,i)=>`<label class="it${S.done[k+'|h'+i]?' dn':''}"><input type="checkbox" ${S.done[k+'|h'+i]?'checked':''} onchange="tg('${k}|h${i}')"><div>${h}</div></label>`).join('')}`}
 function vCal(){const{y,m}=cm,off=(new Date(y,m,1).getDay()+6)%7,dim=new Date(y,m+1,0).getDate(),c={D:0,N:0,V:0},tk=key(today());let g='<i></i>'.repeat(off);
  for(let d=1;d<=dim;d++){const dt=new Date(y,m,d),t=type(dt),k=key(dt);if(c[t]!=null)c[t]++;const dn=plan(dt).some((p,i)=>p.tr&&S.done[k+'|'+i]);g+=`<button class="cd ${t}${k==tk?' td':''}" onclick="pick(${y},${m},${d})">${d}<span>${t=='O'?'':M[t][0]}</span>${dn?'<u></u>':''}</button>`}
@@ -93,11 +105,11 @@ function ts(){if(T.run){T.left=T.end-Date.now();T.run=0}else{if(T.ph=='idle'||T.
 setInterval(()=>{if(!T.run)return;const l=T.end-Date.now();if(l<=0)nx();else{if(T.ph=='work'&&l<=10500&&!T.w10&&T.w>20){T.w10=1;bp(660,.15,2)}upd()}},200);
 function pre(i){T.r=PR[i][1];T.w=PR[i][2];T.s=PR[i][3];T.run=0;T.ph='idle';render()}
 function upd(){const e=$('#tm');if(!e)return;const ms=T.run?T.end-Date.now():T.ph=='idle'?T.w*1000:T.left,s=Math.max(0,Math.ceil(ms/1000));e.textContent=pad(Math.floor(s/60))+':'+pad(s%60);$('#ph').textContent={idle:'Ready',prep:'Get ready',work:'Fight!',rest:'Rest',done:'Done 🔔'}[T.ph];$('#rd').textContent=T.ph=='idle'?T.r+' rounds':'Round '+T.i+' / '+T.r;$('#tb').className='tb '+T.ph;$('#go').textContent=T.run?'Pause':'Start'}
-function vProg(){const n=today(),mon=addD(n,-((n.getDay()+6)%7));let wk=0,mo=0;
- for(let i=0;i<30;i++){const dt=addD(n,-i),k=key(dt),c=plan(dt).filter((p,j)=>p.tr&&S.done[k+'|'+j]).length;mo+=c;if(dt>=mon)wk+=c}
+function vProg(){const n=today(),mon=addD(n,-((n.getDay()+6)%7));let wk=0,mo=0,cl=0;
+ for(let i=0;i<30;i++){const dt=addD(n,-i),k=key(dt),c=plan(dt).filter((p,j)=>p.tr&&S.done[k+'|'+j]).length;mo+=c;cl+=plan(dt).filter((p,j)=>p.cl&&S.done[k+'|'+j]).length;if(dt>=mon)wk+=c}
  const w=S.wt,d=w.length>1?(w[w.length-1].kg-w[0].kg).toFixed(1):null;
  return`<h1>Progress</h1><div class="big" style="margin-top:14px"><div><b>${wk}/5</b><span>sessions this week</span></div><div><b>${mo}</b><span>sessions, last 30 days</span></div></div>
- <h2>Body weight</h2><div class="row"><input type="number" step="0.1" id="kg" placeholder="kg" style="flex:1"><button class="btn" onclick="aw()">Add</button></div>
+ <h2>Club budget</h2><div class="fs" style="grid-template-columns:1fr 1fr"><div><label>Club sessions per week</label><input type="number" min="0" max="5" value="${S.cfg.club}" onchange="S.cfg.club=Math.min(5,Math.max(0,+this.value||0));save();render()"></div><div><label>Price per session (₽)</label><input type="number" value="${S.cfg.price||''}" onchange="S.cfg.price=+this.value||0;save();render()"></div></div><p style="color:var(--mut)">Planned: ${S.cfg.club} per week${S.cfg.price?' = '+S.cfg.club*S.cfg.price+' ₽':''}<br>Attended, last 30 days: ${cl}${S.cfg.price?' = '+cl*S.cfg.price+' ₽':''}</p><h2>Body weight</h2><div class="row"><input type="number" step="0.1" id="kg" placeholder="kg" style="flex:1"><button class="btn" onclick="aw()">Add</button></div>
  <p style="color:var(--mut)">${w.length?w.slice(-6).reverse().map(x=>x.d.slice(5)+': '+x.kg+' kg').join(' · ')+(d!==null?'<br>Change since first entry: '+(d>0?'+':'')+d+' kg':''):'Weigh yourself in the morning, same conditions each time.'}</p>
  <h2>Boxing bag checklist</h2>${KIT.map((k,i)=>`<label class="kit"><input type="checkbox" ${S.kit[i]?'checked':''} onchange="S.kit[${i}]=this.checked;save()">${k}</label>`).join('')}
  <h2>Shift calendar</h2><button class="btn g" onclick="if(confirm('Remove all manual shift edits?')){S.ov={};save();render()}">Reset my edits</button>`}
