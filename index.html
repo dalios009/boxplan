@@ -1,365 +1,161 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#090b12">
-<title>BoxPlan — Boxing & Shift Planner</title>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>BoxPlan</title><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="BoxPlan"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="theme-color" content="#060813">
 <style>
-:root{color-scheme:dark;--bg:#090b12;--card:#141824;--line:#292f40;--text:#f3f5fa;--muted:#969fb4;--red:#ff573f;--green:#4cdb9b;--yellow:#ffc85c}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,sans-serif}
-button,input,select{font:inherit}
-button{cursor:pointer}
-header{padding:22px 18px 12px;max-width:850px;margin:auto}
-header small,.muted{color:var(--muted)}
-h1{font-size:27px;letter-spacing:-1px;margin:0}
-main{max-width:850px;margin:auto;padding:10px 16px 100px}
-nav{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:center;background:#10131df2;border-top:1px solid var(--line);padding:8px 4px calc(8px + env(safe-area-inset-bottom));z-index:10}
-nav button{flex:1;max-width:170px;border:0;background:none;color:var(--muted);padding:9px 2px;font-size:12px}
-nav button.active{color:var(--red)}
-nav b{display:block;font-size:20px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:17px;padding:16px;margin:12px 0}
-.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.between{justify-content:space-between}
-.grow{flex:1;min-width:0}
-h2{font-size:18px;margin:0 0 12px}
-h3{font-size:15px;margin:0 0 5px}
-p{margin:7px 0}
-.big{font-size:32px;font-weight:800;letter-spacing:-1px}
-.muted{font-size:13px}
-.btn{border:0;border-radius:11px;background:var(--red);color:white;font-weight:750;padding:11px 14px}
-.btn.secondary{background:#252b3a;color:var(--text)}
-.btn.small{padding:7px 10px;font-size:13px}
-input,select{background:#0d111b;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:10px;width:100%;min-width:0}
-label{display:block;font-size:13px;color:var(--muted);margin:10px 0 5px}
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.stat{padding:13px;background:#0e121c;border-radius:12px}
-.badge{display:inline-block;border-radius:7px;padding:4px 8px;font-size:12px;font-weight:800;background:#292e3e}
-.badge.D{color:#ffd16b}.badge.N{color:#a9aaff}.badge.O{color:var(--green)}
-.badge.V{color:#ffb5a9}
-.list{display:flex;gap:11px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--line)}
-.list:last-child{border-bottom:0}
-.list input[type=checkbox]{width:21px;height:21px;accent-color:var(--red);margin-top:3px}
-.list.done{opacity:.55}
-.list.done .task{text-decoration:line-through}
-.calendar{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
-.day{min-width:0;aspect-ratio:1;border:1px solid var(--line);border-radius:9px;background:#111521;color:var(--text);padding:3px;font-size:12px}
-.day.D{background:#382c16}.day.N{background:#202044}.day.O{background:#153127}.day.V{background:#40231f}
-.day.selected{outline:2px solid var(--red)}
-.day .mark{display:block;font-size:10px}
-.timer{font-size:clamp(44px,13vw,68px);font-weight:850;letter-spacing:-3px;text-align:center;font-variant-numeric:tabular-nums}
-.timerbar{height:7px;border-radius:9px;background:#303649;overflow:hidden;margin:16px 0}
-.timerbar div{height:100%;width:0;background:var(--red)}
-.preset{display:flex;gap:7px;flex-wrap:wrap;margin:12px 0}
-.preset button{flex:1;min-width:65px}
-.exercise{padding:10px 0;border-bottom:1px solid var(--line)}
-.exercise:last-child{border-bottom:0}
-.exercise strong{display:block}
-.notice{border-left:3px solid var(--yellow);padding:9px 12px;background:#242014;border-radius:5px;font-size:13px}
-footer{text-align:center;color:var(--muted);font-size:12px;padding:20px}
-@media(min-width:600px){main{padding-top:16px}.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
-</style>
-</head>
-<body>
-<header>
- <div class="row between">
-  <div><small>YOUR PERSONAL TRAINING SYSTEM</small><h1>🥊 BoxPlan</h1></div>
-  <button class="btn secondary small" onclick="exportData()">Backup ↗</button>
- </div>
-</header>
-<main id="app"></main>
-<nav id="nav"></nav>
+:root{--bg:#f3f1ec;--card:#fff;--ink:#15172a;--mut:#6a6f88;--line:#dedad0;--acc:#e2452b;--day:#b87a00;--dayb:#fdf0cc;--night:#4a52d6;--nightb:#e3e5fc;--vac:#13875a;--vacb:#d6f2e5;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#060813;--card:#0f1228;--ink:#eceeff;--mut:#868cb0;--line:#1e2347;--acc:#ff6a4d;--day:#f7b92c;--dayb:#2a2108;--night:#8a91ff;--nightb:#11153a;--vac:#33d695;--vacb:#0c2a21;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#060813;--card:#0f1228;--ink:#eceeff;--mut:#868cb0;--line:#1e2347;--acc:#ff6a4d;--day:#f7b92c;--dayb:#2a2108;--night:#8a91ff;--nightb:#11153a;--vac:#33d695;--vacb:#0c2a21;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.45 -apple-system,system-ui,"Segoe UI",Roboto,sans-serif;overflow:hidden}
+#app{display:flex;flex-direction:column;height:100%}
+main{flex:1;overflow-y:auto;padding:16px 16px 28px}
+nav{display:flex;background:var(--card);border-top:1px solid var(--line)}
+nav button{flex:1;border:0;background:none;color:var(--mut);padding:8px 0 10px;font:600 12px system-ui;display:flex;flex-direction:column;align-items:center;gap:2px}
+nav button b{font-size:20px;filter:grayscale(1);opacity:.7}nav button.on{color:var(--acc)}nav button.on b{filter:none;opacity:1}
+h1{font:800 22px/1.15 system-ui;margin:0;letter-spacing:-.01em}h2{font:700 16px system-ui;margin:22px 0 8px}
+.row{display:flex;align-items:center;gap:10px}.c{flex:1;text-align:center}
+.ic{width:42px;height:42px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:22px}
+.banner{display:flex;gap:14px;align-items:center;border-radius:16px;padding:14px 16px;margin:14px 0 4px;border:1px solid var(--line);background:var(--card)}
+.banner span{font-size:34px}.banner small{display:block;color:var(--mut)}.banner b{font-size:18px}
+.banner.D{background:var(--dayb);border-color:var(--day)}.banner.N{background:var(--nightb);border-color:var(--night)}.banner.V{background:var(--vacb);border-color:var(--vac)}
+.it{display:flex;gap:10px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:11px 12px;margin-bottom:8px}
+.it input{width:22px;height:22px;margin:2px 0 0;accent-color:var(--acc);flex:none}.it i{font-style:normal;font-size:22px}
+.it p{margin:1px 0 0;color:var(--mut)}.it.dn{opacity:.5}.it.dn p{text-decoration:line-through}
+.pill{font:700 11px system-ui;background:var(--acc);color:#fff;border-radius:99px;padding:2px 8px;margin-left:6px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.chip{border:1px solid var(--line);background:var(--card);border-radius:99px;padding:6px 12px;font-weight:600}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}.grid>div{text-align:center;color:var(--mut);font-weight:600;font-size:12px}
+.cd{aspect-ratio:1;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--mut);display:flex;flex-direction:column;align-items:center;justify-content:center;font:700 16px system-ui;position:relative;padding:0}
+.cd span{font-size:14px;line-height:1}.cd.D{background:var(--dayb);border-color:var(--day);color:var(--day)}.cd.N{background:var(--nightb);border-color:var(--night);color:var(--night)}.cd.V{background:var(--vacb);border-color:var(--vac);color:var(--vac)}
+.cd.td{outline:2px solid var(--acc);outline-offset:1px}.cd u{position:absolute;right:6px;top:6px;width:8px;height:8px;border-radius:50%;background:var(--acc)}
+.btn{border:0;border-radius:12px;background:var(--acc);color:#fff;font:700 15px system-ui;padding:11px 16px}.btn.g{background:var(--card);color:var(--ink);border:1px solid var(--line)}
+.tb{border-radius:22px;padding:26px 10px;text-align:center;background:var(--card);border:1px solid var(--line)}
+.tb.work{background:var(--acc);color:#fff}.tb.rest{background:var(--vacb);color:var(--vac)}.tb.prep{background:var(--dayb);color:var(--day)}
+#tm{font:800 84px/1 ui-monospace,Menlo,monospace;letter-spacing:-.03em}#ph{font:800 20px system-ui}
+.fs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}.fs label{font-size:12px;color:var(--mut)}
+input[type=number]{width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:700 17px system-ui}
+.big{display:flex;gap:10px}.big>div{flex:1;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px}.big b{font:800 34px/1 system-ui;display:block}.big span{color:var(--mut)}
+.kit{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}.kit input{accent-color:var(--acc);width:20px;height:20px}
+.fg{width:100%;height:150px;background:var(--bg);border-radius:12px;display:block}
+.mc{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px;margin:8px 0 12px}.mc ol{margin:6px 0;padding-left:20px}
+.frm label{display:block;font-size:12px;color:var(--mut);margin:10px 0 4px}.frm .kit{display:flex;font-size:15px;color:var(--ink);margin:0}
+input[type=text],input[type=date],select{width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:600 16px system-ui}
+input[type=date]{-webkit-appearance:none;appearance:none;display:block;min-width:0;max-width:100%;height:46px;text-align:left}
+input[type=date]::-webkit-date-and-time-value{text-align:left}
+</style></head><body><div id="app"><main id="main"></main><nav id="nav"></nav></div>
 <script>
-"use strict";
-
-/* Keep the original BoxPlan storage key and preserve its existing data. */
-const $=s=>document.querySelector(s);
-const pad=n=>String(n).padStart(2,"0");
-const key=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
-const dateOf=k=>{const [y,m,d]=k.split("-").map(Number);return new Date(y,m-1,d)};
-const shiftDate=(d,n)=>new Date(d.getFullYear(),d.getMonth(),d.getDate()+n);
-const today=()=>{const d=new Date();return new Date(d.getFullYear(),d.getMonth(),d.getDate())};
-const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
-
-let old={};
-try{old=JSON.parse(localStorage.getItem("bp")||"{}")||{}}catch(e){}
-let saved={};
-try{saved=JSON.parse(localStorage.getItem("boxplan_v4")||"{}")||{}}catch(e){}
-
-const defaults={
- anchor:"2026-10-15",
- cycle:["D","N","O","O"],
- overrides:{},done:{},history:[],recovery:{},
- settings:{round:180,rest:60,rounds:3,club:2},
- timer:{},tab:"today",selected:key(today()),
- old:old
-};
-let S={...defaults,...saved};
-S.settings={...defaults.settings,...(S.settings||{})};
-S.overrides=S.overrides||{};
-S.done=S.done||{};
-S.history=S.history||[];
-S.recovery=S.recovery||{};
-S.cycle=Array.isArray(S.cycle)&&S.cycle.length?S.cycle:["D","N","O","O"];
-S.old=S.old||old;
-
-function save(){
- try{localStorage.setItem("boxplan_v4",JSON.stringify(S))}
- catch(e){alert("Storage is full. Export a backup before continuing.")}
-}
-function migrate(){
- /* Copy old calendar overrides, completions and equipment checks without
-    overwriting the original bp object. */
- const o=S.old||{};
- S.overrides={...(o.ov||{}),...(S.overrides||{})};
- S.done={...(o.done||{}),...(S.done||{})};
- S.kit={...(o.kit||{}),...(S.kit||{})};
-}
-migrate();
-
-function type(d){
- const k=key(d);
- if(S.overrides[k])return S.overrides[k];
- const a=dateOf(S.anchor||key(today()));
- const diff=Math.round((Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())-
-  Date.UTC(a.getFullYear(),a.getMonth(),a.getDate()))/86400000);
- return S.cycle[((diff%S.cycle.length)+S.cycle.length)%S.cycle.length]||"O";
-}
-const labels={D:["☀️","Day shift","09:00–21:00"],N:["🌙","Night shift","21:00–09:00"],O:["💤","Day off","Recovery / training"],V:["🏖️","Vacation","Light training / rest"]};
-
-const plans={
- technique:[
- ["Warm-up","Jump rope, shoulder mobility and light movement","10 min"],
- ["Footwork","Step forward/backward, lateral steps, pivot after jab","4 × 2 min"],
- ["Jab development","Single jab, double jab, jab while moving","4 × 2 min"],
- ["Defense","Slip, roll, step back, parry; return with a counter","4 × 2 min"],
- ["Combinations","Jab–cross, jab–cross–hook, body-head combinations","4 × 2 min"],
- ["Cool-down","Easy breathing, gentle mobility, note one improvement","5 min"]
- ],
- conditioning:[
- ["Warm-up","Easy rope and dynamic mobility","8 min"],
- ["Rope rounds","Relaxed rhythm; maintain posture and breathing","4 × 3 min"],
- ["Shadowboxing","Footwork and clean technique, not maximum speed","3 × 3 min"],
- ["Bodyweight circuit","Push-ups, squats, rows or band pulls, plank","3 rounds"],
- ["Cool-down","Walk and gentle stretching","5 min"]
- ],
- recovery:[
- ["Easy movement","Comfortable walk or very easy cycling","15–30 min"],
- ["Mobility","Hips, ankles, thoracic spine and shoulders","10 min"],
- ["Technique","Optional relaxed shadowboxing, no hard intervals","3 × 2 min"],
- ["Review","Record energy, sleep and any pain","2 min"]
- ],
- shadow:[
- ["Warm-up","Relax shoulders, easy bounce, stance and guard","5 min"],
- ["Round 1","Jab only: range, balance, quick return to guard","3 min"],
- ["Round 2","Jab–cross with exits and lateral movement","3 min"],
- ["Round 3","Slip or parry, then counter; stay balanced","3 min"],
- ["Round 4","Free shadowboxing: accuracy and relaxed breathing","3 min"],
- ["Cool-down","Breathing and light mobility","5 min"]
- ]
-};
-
-function recommend(d){
- const t=type(d),prev=type(shiftDate(d,-1)),next=type(shiftDate(d,1));
- if(t==="V")return {name:"Recovery session",kind:"recovery",why:"Keep the session easy; vacation is not a requirement to train hard."};
- if(t==="D")return {name:"Short technique session",kind:"shadow",why:"Keep training short before a 09:00–21:00 shift. Skip it if sleep is insufficient."};
- if(t==="N"&&prev==="N")return {name:"Post-shift recovery",kind:"recovery",why:"After working overnight, sleep takes priority. Avoid hard training before recovery sleep."};
- if(t==="N")return {name:"Pre-shift technique",kind:"shadow",why:"A short session before a 21:00–09:00 shift. Finish well before leaving for work."};
- if(prev==="N")return {name:"Recovery after night shift",kind:"recovery",why:"Protect daytime sleep. Train lightly only when rested."};
- return {name:"Boxing technique",kind:"technique",why:"Use the free day for skill development; increase intensity only when recovered."};
-}
-function recovery(d){
- return S.recovery[key(d)]||{sleep:7,energy:3,soreness:1};
-}
-function workout(d){
- const r=recovery(d);
- if(r.sleep<5||r.energy<=1||r.soreness>=4)
-  return {name:"Recovery only",kind:"recovery",why:"Your recovery score is low. Prioritize sleep and gentle movement."};
- return recommend(d);
-}
-function escape(s){
- return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-}
-function completed(k){return Object.keys(S.done).filter(x=>x.startsWith(k+"|")&&S.done[x]).length}
-function totalCompleted(){return Object.values(S.done).filter(Boolean).length}
-function sessionCount(){return S.history.length}
-function weekStats(){
- const start=shiftDate(today(),-6),days=[];
- for(let i=0;i<7;i++)days.push(key(shiftDate(start,i)));
- return days.filter(k=>Object.keys(S.done).some(x=>x.startsWith(k+"|")&&S.done[x])).length;
-}
-function card(s){return '<section class="card">'+s+'</section>'}
-function btn(label,fn,cls=""){
- return '<button class="btn '+cls+'" onclick="'+fn+'">'+label+'</button>';
-}
-function render(){
- $("#nav").innerHTML=[
- ["today","🏠","Today"],["calendar","📅","Schedule"],["coach","🥊","Coach"],["timer","⏱️","Timer"],["progress","📈","Progress"]
- ].map(([id,icon,name])=>'<button class="'+(S.tab===id?"active":"")+'" onclick="tab(\''+id+'\')"><b>'+icon+'</b>'+name+'</button>').join("");
- const views={today:viewToday,calendar:viewCalendar,coach:viewCoach,timer:viewTimer,progress:viewProgress};
- $("#app").innerHTML=(views[S.tab]||viewToday)();
- save();
-}
-function tab(t){S.tab=t;render()}
-function selectDay(k){S.selected=k;S.tab="today";render()}
-function viewToday(){
- const d=dateOf(S.selected||key(today())),k=key(d),t=type(d),m=labels[t],w=workout(d),r=recovery(d);
- const list=plans[w.kind]||plans.technique;
- const items=list.map((x,i)=>{
-  const id=k+"|"+i,done=!!S.done[id];
-  return '<div class="list '+(done?"done":"")+'"><input type="checkbox" '+(done?"checked":"")+' onchange="toggleTask(\''+id+'\')"><div class="grow"><strong class="task">'+escape(x[0])+'</strong><p>'+escape(x[1])+'</p><small class="muted">'+escape(x[2])+'</small></div></div>';
- }).join("");
- return '<div class="row between"><div><div class="muted">'+d.toLocaleDateString(undefined,{weekday:"long",day:"numeric",month:"long",year:"numeric"})+'</div><h2 style="margin:4px 0">Your day</h2></div>'+btn("Today","selectDay(\''+key(today())+'\')","secondary small")+'</div>'+
- card('<div class="row"><span style="font-size:34px">'+m[0]+'</span><div class="grow"><span class="badge '+t+'">'+m[1]+'</span><h2 style="margin:6px 0">'+m[2]+'</h2><div class="muted">'+k+'</div></div></div>')+
- card('<div class="row between"><div><div class="muted">Recommended workout</div><h2 style="margin:4px 0">'+escape(w.name)+'</h2></div><span style="font-size:28px">🥊</span></div><p class="muted">'+escape(w.why)+'</p><div class="grid"><div class="stat"><div class="muted">Sleep</div><strong>'+r.sleep+' h</strong></div><div class="stat"><div class="muted">Energy</div><strong>'+r.energy+'/5</strong></div><div class="stat"><div class="muted">Soreness</div><strong>'+r.soreness+'/5</strong></div></div><p>'+btn("Start round timer","tab(\'timer\')")+' '+btn("Edit recovery","tab(\'progress\')","secondary")+'</p>')+
- '<h2>Session checklist</h2>'+card(items+'<div class="row between"><span class="muted">'+completed(k)+' of '+list.length+' complete</span>'+btn("Reset checklist","resetDay(\''+k+'\')","secondary small")+'</div>')+
- '<h2>Quick schedule</h2>'+card('<div class="row">'+btn("Previous day","selectDay(\''+key(shiftDate(d,-1))+'\')","secondary")+'<div class="grow" style="text-align:center">'+escape(k)+'</div>'+btn("Next day","selectDay(\''+key(shiftDate(d,1))+'\')","secondary")+'</div>');
-}
-function toggleTask(id){S.done[id]=!S.done[id];save();render()}
-function resetDay(k){if(confirm("Reset this day's checklist?")){Object.keys(S.done).filter(x=>x.startsWith(k+"|")).forEach(x=>delete S.done[x]);save();render()}}
-let month=new Date(today().getFullYear(),today().getMonth(),1);
-function viewCalendar(){
- const first=new Date(month.getFullYear(),month.getMonth(),1),offset=(first.getDay()+6)%7;
- const start=shiftDate(first,-offset);
- let html='<div class="row between"><button class="btn secondary" onclick="moveMonth(-1)">‹</button><h2>'+month.toLocaleDateString(undefined,{month:"long",year:"numeric"})+'</h2><button class="btn secondary" onclick="moveMonth(1)">›</button></div><div class="calendar">';
- ["M","T","W","T","F","S","S"].forEach(x=>html+='<div class="muted" style="text-align:center">'+x+'</div>');
- for(let i=0;i<42;i++){
-  const d=shiftDate(start,i),k=key(d),t=type(d);
-  html+='<button class="day '+t+' '+(k===S.selected?"selected":"")+'" onclick="selectDay(\''+k+'\')">'+d.getDate()+'<span class="mark">'+t+'</span></button>';
- }
- html+='</div><p class="muted">Tap a day to view its plan. You can override the shift for individual dates.</p>';
- return card(html)+card('<h2>Shift settings</h2><label>Rotation start date</label><input type="date" id="anchor" value="'+escape(S.anchor)+'"><label>Four-day rotation, in order</label><div class="grid">'+[0,1,2,3].map(i=>'<div><label>Day '+(i+1)+'</label><select id="cy'+i+'">'+["D","N","O","V"].map(t=>'<option value="'+t+'" '+(S.cycle[i]===t?"selected":"")+'>'+labels[t][1]+'</option>').join("")+'</select></div>').join("")+'</div><label>Selected date override</label><select id="override">'+["Auto","D","N","O","V"].map(t=>'<option value="'+t+'" '+((S.overrides[S.selected]||"Auto")===t?"selected":"")+'>'+(t==="Auto"?"Use rotation":labels[t][1])+'</option>').join("")+'</select><p>'+btn("Save schedule","saveSchedule()")+'</p>');
-}
-function moveMonth(n){month=new Date(month.getFullYear(),month.getMonth()+n,1);render()}
-function saveSchedule(){
- S.anchor=$("#anchor").value||key(today());
- S.cycle=[0,1,2,3].map(i=>$("#cy"+i).value);
- const v=$("#override").value;
- if(v==="Auto")delete S.overrides[S.selected];else S.overrides[S.selected]=v;
- save();render();
-}
-function viewCoach(){
- return '<h2>Boxing coach</h2><p class="muted">Intermediate skill development. Prioritize quality, balance and defense over speed or exhaustion.</p>'+
- card('<h2>Choose a session</h2>'+Object.entries({technique:"Technical fundamentals",shadow:"Shadowboxing & combinations",conditioning:"Conditioning",recovery:"Recovery session"}).map(([k,n])=>'<div class="exercise"><div class="row between"><div class="grow"><strong>'+n+'</strong><small class="muted">'+plans[k].length+' activities</small></div>'+btn("Open","showPlan(\''+k+'\')","secondary small")+'</div></div>').join(""))+
- card('<h2>Training principles</h2><p>• Keep your guard up and return to stance after every combination.</p><p>• Practice both sides, controlled pivots and exits.</p><p>• Stop if you feel sharp pain, dizziness or unusual shortness of breath.</p><p>• Do not spar hard without a qualified coach and appropriate protective equipment.</p>');
-}
-function showPlan(k){
- S.currentPlan=k;
- $("#app").innerHTML='<button class="btn secondary" onclick="render()">← Back</button><h2 style="margin-top:18px">'+escape(k.toUpperCase())+' session</h2>'+card(plans[k].map((x,i)=>'<div class="exercise"><strong>'+escape(x[0])+' · '+escape(x[2])+'</strong><p class="muted">'+escape(x[1])+'</p>'+btn("Start timer","setRound('+Math.max(30,parseInt(x[2])||180)+')","secondary small")+'</div>').join(""))+
- '<p>'+btn("Start 3-minute round","setRound(180)")+'</p>';
-}
-let timerState={running:false,ends:0,remaining:180,mode:"Round",round:1,rounds:3,roundSec:180,restSec:60,lastSaved:0};
-function restoreTimer(){
- try{
-  const t=JSON.parse(localStorage.getItem("boxplan_timer")||"null");
-  if(t&&Number.isFinite(t.remaining)){
-   timerState={...timerState,...t,running:false};
-   if(t.running&&t.ends)timerState.remaining=Math.max(0,Math.ceil((t.ends-Date.now())/1000));
-  }
- }catch(e){}
-}
-restoreTimer();
-function timerSave(){
- try{localStorage.setItem("boxplan_timer",JSON.stringify(timerState))}catch(e){}
-}
-function setRound(sec){
- timerState.running=false;timerState.mode="Round";
- timerState.remaining=clamp(Number(sec)||180,1,7200);
- timerState.roundSec=timerState.remaining;timerState.round=1;
- timerState.rounds=Number(S.settings.rounds)||3;
- timerState.ends=0;timerSave();S.tab="timer";render();
-}
-function startTimer(){
- if(timerState.remaining<=0)timerState.remaining=timerState.mode==="Rest"?timerState.restSec:timerState.roundSec;
- timerState.running=true;timerState.ends=Date.now()+timerState.remaining*1000;timerSave();render();
-}
-function pauseTimer(){
- if(timerState.running)timerState.remaining=Math.max(0,Math.ceil((timerState.ends-Date.now())/1000));
- timerState.running=false;timerState.ends=0;timerSave();render();
-}
-function resetTimer(){
- timerState.running=false;timerState.ends=0;
- timerState.remaining=timerState.mode==="Rest"?timerState.restSec:timerState.roundSec;
- timerSave();render();
-}
-function formatTime(s){s=Math.max(0,Math.ceil(s));return pad(Math.floor(s/60))+":"+pad(s%60)}
-function timerTick(){
- if(!timerState.running)return;
- timerState.remaining=Math.max(0,Math.ceil((timerState.ends-Date.now())/1000));
- if(timerState.remaining<=0){
-  timerState.running=false;timerState.ends=0;
-  if(timerState.mode==="Round"&&timerState.round<timerState.rounds){
-   timerState.mode="Rest";timerState.remaining=timerState.restSec;
-  }else if(timerState.mode==="Rest"){
-   timerState.round++;timerState.mode="Round";timerState.remaining=timerState.roundSec;
-  }
-  timerSave();
-  if(navigator.vibrate)try{navigator.vibrate([250,100,250])}catch(e){}
-  render();
- }else if(Date.now()-timerState.lastSaved>1000){
-  timerState.lastSaved=Date.now();timerSave();
- }
-}
-setInterval(timerTick,250);
-document.addEventListener("visibilitychange",()=>{if(!document.hidden&&timerState.running)timerTick()});
-function viewTimer(){
- const t=timerState;
- const total=t.mode==="Rest"?t.restSec:t.roundSec;
- const pct=total?100*(1-t.remaining/total):0;
- return '<h2>Round timer</h2>'+card('<div class="row between"><span class="badge">'+escape(t.mode)+'</span><span class="muted">Round '+t.round+' / '+t.rounds+'</span></div><div class="timer" id="clock">'+formatTime(t.remaining)+'</div><div style="text-align:center" class="muted">'+(t.running?"Timer running":t.remaining===0?"Finished":"Ready")+'</div><div class="timerbar"><div style="width:'+pct+'%"></div></div><div class="row">'+(t.running?btn("Pause","pauseTimer()"):btn("Start","startTimer()"))+btn("Reset","resetTimer()","secondary")+'</div><div class="preset">'+[30,60,180,300].map(n=>btn(n<60?n+" sec":n/60+" min","setRound("+n+")","secondary small")).join("")+'</div><div class="grid"><div><label>Round length (sec)</label><input id="roundSec" type="number" min="1" max="7200" value="'+t.roundSec+'"></div><div><label>Rest (sec)</label><input id="restSec" type="number" min="0" max="1800" value="'+t.restSec+'"></div><div><label>Rounds</label><input id="rounds" type="number" min="1" max="20" value="'+t.rounds+'"></div></div><p>'+btn("Apply timer settings","applyTimerSettings()","secondary")+'</p>')+
- card('<h2>Timer tip</h2><p class="muted">The countdown uses a real end timestamp, so it catches up when your phone locks or the browser goes into the background. Keep this page open when possible; browser notifications and sounds may be restricted by your phone.</p>');
-}
-function applyTimerSettings(){
- const rs=clamp(Number($("#roundSec").value)||180,1,7200);
- const rest=clamp(Number($("#restSec").value)||0,0,1800);
- const rounds=clamp(Number($("#rounds").value)||3,1,20);
- timerState.running=false;timerState.ends=0;timerState.roundSec=rs;
- timerState.restSec=rest;timerState.rounds=rounds;timerState.round=1;
- timerState.mode="Round";timerState.remaining=rs;timerSave();render();
-}
-function viewProgress(){
- const k=S.selected||key(today()),r=recovery(dateOf(k));
- return '<h2>Progress & recovery</h2>'+card('<div class="grid"><div class="stat"><div class="muted">Tasks completed</div><div class="big">'+totalCompleted()+'</div></div><div class="stat"><div class="muted">Training days this week</div><div class="big">'+weekStats()+'</div></div><div class="stat"><div class="muted">Logged sessions</div><div class="big">'+sessionCount()+'</div></div></div>')+
- card('<h2>Daily recovery log</h2><p class="muted">Selected date: '+escape(k)+'</p><label>Sleep (hours)</label><input id="sleep" type="number" min="0" max="24" step=".5" value="'+r.sleep+'"><label>Energy (1–5)</label><input id="energy" type="number" min="1" max="5" value="'+r.energy+'"><label>Muscle soreness (1–5)</label><input id="soreness" type="number" min="1" max="5" value="'+r.soreness+'"><p>'+btn("Save recovery","saveRecovery()")+'</p><p class="muted">Use this log to adjust the recommended session. Stop training if you are ill or injured.</p>')+
- card('<h2>Training log</h2><p class="muted">Record a session you completed outside the checklist.</p><label>Session</label><input id="logName" type="text" placeholder="e.g. Boxing class, footwork"><label>Minutes</label><input id="logMinutes" type="number" min="1" max="600" value="45"><p>'+btn("Log session","logSession()")+'</p>'+S.history.slice(-12).reverse().map(x=>'<div class="exercise"><strong>'+escape(x.name)+'</strong><div class="muted">'+escape(x.date)+' · '+x.minutes+' min</div></div>').join(""));
-}
-function saveRecovery(){
- const k=S.selected||key(today());
- S.recovery[k]={sleep:clamp(Number($("#sleep").value)||0,0,24),energy:clamp(Number($("#energy").value)||1,1,5),soreness:clamp(Number($("#soreness").value)||1,1,5)};
- save();render();
-}
-function logSession(){
- const name=$("#logName").value.trim(),minutes=clamp(Number($("#logMinutes").value)||0,1,600);
- if(!name){alert("Enter a session name first.");return}
- S.history.push({name,minutes,date:S.selected||key(today())});
- save();render();
-}
-function exportData(){
- const data={boxplan:S,legacy:JSON.parse(localStorage.getItem("bp")||"{}")};
- const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
- const url=URL.createObjectURL(blob),a=document.createElement("a");
- a.href=url;a.download="boxplan-backup-"+key(today())+".json";a.click();
- setTimeout(()=>URL.revokeObjectURL(url),1000);
-}
-function importData(file){
- const reader=new FileReader();
- reader.onload=()=>{
-  try{
-   const data=JSON.parse(reader.result);
-   const obj=data.boxplan||data;
-   if(!obj||typeof obj!=="object")throw Error("Invalid backup");
-   if(!confirm("Import backup and replace current BoxPlan settings?"))return;
-   S={...defaults,...obj};
-   save();render();alert("Backup imported.");
-  }catch(e){alert("Could not import this backup file.")}
- };
- reader.readAsText(file);
-}
-function viewSettings(){
- return card('<h2>Data & settings</h2><p class="muted">Your data is stored locally in this browser. Keep backups before clearing browser data or switching devices.</p><p>'+btn("Export backup","exportData()")+'</p><label>Restore a BoxPlan JSON backup</label><input type="file" accept=".json,application/json" onchange="importData(this.files[0])"><p>'+btn("Return to Today","tab(\'today\')","secondary")+'</p>');
-}
+const VER=3;
+const $=s=>document.querySelector(s),pad=n=>String(n).padStart(2,'0');
+let S={};try{S=JSON.parse(localStorage.getItem('bp')||'{}')}catch(e){}
+S.ov=S.ov||{};S.done=S.done||{};S.wt=S.wt||[];S.kit=S.kit||{};S.cfg=S.cfg||{club:2,price:0};
+const save=()=>{try{localStorage.setItem('bp',JSON.stringify(S))}catch(e){}};
+const key=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const addD=(d,n)=>new Date(d.getFullYear(),d.getMonth(),d.getDate()+n);
+const DAYS="10-02 10-03 10-10 10-11 10-18 10-19 10-26 10-27 11-03 11-04 11-11 11-12 11-19 11-20 11-27 11-28".split(' ');
+const NIGHTS="10-05 10-06 10-07 10-08 10-12 10-14 10-15 10-22 10-23 10-30 10-31 11-07 11-08 11-15 11-16 11-23 11-24".split(' ');
+function base(d){const k=key(d);if(k>='2026-10-15'&&k<='2026-10-28')return'V';
+ if(k>='2026-10-01'&&k<='2026-11-30'){const m=k.slice(5);return DAYS.includes(m)?'D':NIGHTS.includes(m)?'N':'O'}
+ if(k>='2026-12-01'){const n=Math.round((Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())-Date.UTC(2026,11,1))/864e5),p=n%8;return p<2?'N':(p==4||p==5)?'D':'O'}
+ return'O'}
+const type=d=>S.ov[key(d)]||base(d);
+const M={D:['☀️','Day shift','09:00 – 21:00'],N:['🌙','Night shift','21:00 – 09:00'],O:['💤','Day off','Heavy training day'],V:['🏖️','Vacation','Training camp']};
+const S1=[['19:30','Спорт-группа, Fedoseev']],CL=[[['12:00','Общая группа, Merkulov']],S1,S1,S1,[S1[0],['19:30','Проф-бокс, Osipov']],S1,[['12:00','Проф-бокс, Osipov']]];
+const AM=['Active recovery: 30 min walk + 20 min stretching','Easy run 35–40 min + 10 min core (plank, leg raises)','Strength A, 45 min: squats, push-ups, rows, lunges, plank. 4 rounds','Intervals: 8 × (30 s sprint / 90 s walk), then rope 5 × 3 min','Strength B, 45 min: deadlifts, pull-ups, med-ball slams, core','Tempo run 25 min + shadowboxing 4 × 3 min','Rope 3 × 3 min + shadowboxing 3 × 3 min + mobility'];
+const SH=['Rope 5 × 3 min + shadowboxing 3 × 3 min + core 5 min','Easy run 25 min + 3 × 15 push-ups + 3 × 8 pull-ups'];
+const H=['💧 2.5 L water','🥩 Protein in every meal','🧘 10 min stretching','😴 Sleep 7 h or more'];
+const KIT=['Gloves 12–16 oz','Hand wraps','Mouthguard','Jump rope','Boxing shoes','Headgear (for sparring)','Medical certificate (справка)','Towel, shower kit, flip-flops, clean clothes','Water bottle'];
+const NS='Shadowboxing 4 × 3 min + rope 3 × 3 min + bodyweight circuit',TECH='Technique at home, 30 min: shadowboxing 5 × 3 min (jab–cross, footwork, defence)';
+const fm=m=>pad(Math.floor(m/60)%24)+':'+pad(m%60),tm=s=>+s.slice(0,2)*60+ +s.slice(3);
+const PREF=[4,6,2,1,3,5,0];
+function clubOn(d){const w=d.getDay(),mon=addD(d,-((w+6)%7)),c=[];
+ for(let i=0;i<7;i++){const x=addD(mon,i),t=type(x),wd=x.getDay();if((t=='O'||t=='V')&&!(type(addD(x,-1))=='N'&&CL[wd][0][0]<'15'))c.push(wd)}
+ c.sort((a,b)=>PREF.indexOf(a)-PREF.indexOf(b));return c.slice(0,S.cfg.club).includes(w)}
+function plan0(d){const t=type(d),w=d.getDay(),pv=type(addD(d,-1))=='N',nx=type(addD(d,1)),L=[],a=(t,i,x,tr,cl,mv)=>L.push({t,i,x,tr,cl,mv});
+ const cb=()=>{const s=tm(CL[w][0][0]),nm=CL[w].map(c=>c[1]).join(' / ');a(fm(s-150),'🍌','Light meal 2 h before: rice or pasta + banana');a(fm(s-75),'🚌','Leave home (1 h to the club). Bag: gloves, wraps, mouthguard, towel, shower kit, clean clothes');a(fm(s),'🥊',nm+', about 90 min',1,1);a(fm(s+90),'🚿','Shower and change at the club (about 20 min)');a(fm(s+110),'🚌','Travel home (1 h), protein meal when you arrive')};
+ if(t=='D'){a('05:45','⏰','Wake up, 500 ml water, light breakfast');a('06:00','🏃',SH[d.getDate()%2]+' (40 min)',1,0,SHM[d.getDate()%2]);a('06:50','🚿','Shower at home, get ready');a('07:45','🚌','Leave home (1 h to work)');a('13:00','🍽️','Mid-shift meal: protein + carbs, nothing heavy or fried');a('21:00','🏁','Shift ends. Travel home (1 h)');a('22:10','🧘','Dinner + 10 min stretching');a(nx=='D'?'22:45':'23:30','😴',nx=='D'?'Lights out, early start tomorrow':'Lights out, 7+ hours of sleep')}
+ else if(t=='N'){if(pv){a('09:00','🏁','Shift ends. Travel home (1 h)');a('10:15','😴','Light meal, shower, sleep 10:45–17:00 in a dark room');a('17:15','🥊',NS+' (40 min, moderate)',1,0,['jab','slip','rope']);a('18:15','🚿','Shower, then main meal')}else{a('13:30','😴','Nap 90 min to prepare for the night');a('16:00','🥊',NS+' (40 min, moderate)',1,0,['jab','slip','rope']);a('16:50','🚿','Shower, then main meal')}a('19:45','🚌','Leave home (1 h to work). Pack water, fruit, nuts, protein bar');a('01:00','🥜','Night snack: banana, nuts or yogurt. No caffeine after 03:00')}
+ else{const club=clubOn(d);
+  if(pv)a('09:30','😴','Sleep 10:00–16:00. Recovery comes first');
+  else{a(t=='V'?'07:30':'08:00','🏃',AM[w]+(club?'. Keep it easy, club today':''),w!=0,0,AMM[w]);a('09:30','🚿','Shower, breakfast: protein + carbs')}
+  if(club)cb();
+  else if(w==0&&!pv)a('17:30','🧘','Rest day: 30 min walk, stretching, meal prep');
+  else a('17:30','🥊',pv?'Light home session: shadowboxing 3 × 3 min + rope 3 × 3 min + mobility':TECH,1,0,['jab','slip']);
+  if(nx=='N')a('23:59','😴','Night shift tomorrow: go to bed late (00:30) and sleep in');
+  else a(nx=='D'?'22:30':'23:30','😴',nx=='D'?'In bed by 22:30, early start tomorrow':'Lights out, 7+ hours of sleep')}
+ return L}
+const today=()=>{const n=new Date();return new Date(n.getFullYear(),n.getMonth(),n.getDate())};
+let tab=S.me?'today':'prog',sel=today(),cm={y:sel.getFullYear(),m:sel.getMonth()},edit=false;
+function vToday(){const t=type(sel),m=M[t],k=key(sel),P=plan(sel),n=P.filter((p,i)=>S.done[k+'|'+i]).length,isT=k==key(today());
+ return`<div class="row"><button class="ic" onclick="mv(-1)">‹</button><div class="c"><h1>${isT?'Today':sel.toLocaleDateString('en-GB',{weekday:'long'})}</h1><small style="color:var(--mut)">${sel.toLocaleDateString('en-GB',{day:'numeric',month:'long'})}</small></div><button class="ic" onclick="mv(1)">›</button></div>
+ <div class="banner ${t}"><span>${m[0]}</span><div><b>${m[1]}</b><small>${m[2]}</small></div></div>
+ <p style="color:var(--mut);margin:10px 0 0">💡 ${TIPS[Math.floor(sel.getTime()/864e5)%TIPS.length]}</p>${ME().hurt?`<p style="margin:6px 0 0">⚠️ Protect: ${ME().hurt}. Skip or lighten any move that hurts.</p>`:''}<h2>Plan · ${n}/${P.length} done</h2>${P.map((p,i)=>`<label class="it${S.done[k+'|'+i]?' dn':''}"><input type="checkbox" ${S.done[k+'|'+i]?'checked':''} onchange="tg('${k}|${i}')"><i>${p.i}</i><div><b>${p.t}</b>${p.cl?'<span class="pill">Club</span>':p.tr?'<span class="pill">Train</span>':''}<p>${p.x}</p>${p.mv&&p.mv.length?`<button class="chip" style="margin-top:6px" onclick="om('${k}|${i}')">${OM[k+'|'+i]?'Hide':'Show'} moves ▾</button>`:''}</div></label>${p.mv&&p.mv.length&&OM[k+'|'+i]?p.mv.map(mvCard).join(''):''}`).join('')}
+ <h2>Daily basics</h2>${H.map((h,i)=>`<label class="it${S.done[k+'|h'+i]?' dn':''}"><input type="checkbox" ${S.done[k+'|h'+i]?'checked':''} onchange="tg('${k}|h${i}')"><div>${h}</div></label>`).join('')}`}
+function vCal(){const{y,m}=cm,off=(new Date(y,m,1).getDay()+6)%7,dim=new Date(y,m+1,0).getDate(),c={D:0,N:0,V:0},tk=key(today());let g='<i></i>'.repeat(off);
+ for(let d=1;d<=dim;d++){const dt=new Date(y,m,d),t=type(dt),k=key(dt);if(c[t]!=null)c[t]++;const dn=plan(dt).some((p,i)=>p.tr&&S.done[k+'|'+i]);g+=`<button class="cd ${t}${k==tk?' td':''}" onclick="pick(${y},${m},${d})">${d}<span>${t=='O'?'':M[t][0]}</span>${dn?'<u></u>':''}</button>`}
+ return`<div class="row"><button class="ic" onclick="cmv(-1)">‹</button><div class="c"><h1>${new Date(y,m,1).toLocaleDateString('en-GB',{month:'long',year:'numeric'})}</h1></div><button class="ic" onclick="cmv(1)">›</button></div>
+ <div class="chips"><span class="chip">☀️ ${c.D}</span><span class="chip">🌙 ${c.N}</span><span class="chip">🏖️ ${c.V}</span></div>
+ <div class="grid">${'Mo Tu We Th Fr Sa Su'.split(' ').map(x=>`<div>${x}</div>`).join('')}${g}</div>
+ <p style="color:var(--mut)">${edit?'Edit mode: tap a day to switch day → night → off → vacation.':'Tap a day to see its plan. A red dot means you trained.'}</p>
+ <button class="btn ${edit?'':'g'}" onclick="edit=!edit;render()">${edit?'Done editing':'✏️ Edit shifts'}</button>`}
+const PR=[['Boxing',3,180,60],['Shadow',5,180,45],['Sprints',8,20,10],['Rope',6,180,60]];
+let T={r:3,w:180,s:60,run:0,ph:'idle',i:1,end:0,left:0,w10:0};
+function vTimer(){return`<h1>Round timer</h1><div class="chips">${PR.map((p,i)=>`<button class="chip" onclick="pre(${i})">${p[0]} ${p[1]}×${p[2]>=60?p[2]/60+'m':p[2]+'s'}</button>`).join('')}</div>
+ <div class="tb" id="tb"><div id="ph"></div><div id="tm"></div><div id="rd" style="color:inherit;opacity:.8"></div></div>
+ <div class="fs"><div><label>Rounds</label><input type="number" id="ir" value="${T.r}" onchange="T.r=+this.value||1;upd()"></div><div><label>Work (sec)</label><input type="number" id="iw" value="${T.w}" onchange="T.w=+this.value||10;upd()"></div><div><label>Rest (sec)</label><input type="number" id="is" value="${T.s}" onchange="T.s=+this.value||0;upd()"></div></div>
+ <div class="row"><button class="btn" style="flex:2" id="go" onclick="ts()">Start</button><button class="btn g" style="flex:1" onclick="T.run=0;T.ph='idle';upd()">Reset</button></div>
+ <p style="color:var(--mut)">10 s get-ready, bell at each round start, warning beeps 10 s before the round ends.</p>`}
+let AC;const ac=()=>{try{AC=AC||new(window.AudioContext||window.webkitAudioContext)()}catch(e){}};
+function bp(f,d,n=1){try{ac();for(let k=0;k<n;k++){const o=AC.createOscillator(),g=AC.createGain(),t0=AC.currentTime+k*.25;o.frequency.value=f;o.connect(g);g.connect(AC.destination);g.gain.setValueAtTime(.3,t0);g.gain.exponentialRampToValueAtTime(.001,t0+d);o.start(t0);o.stop(t0+d)}navigator.vibrate&&navigator.vibrate(200)}catch(e){}}
+function nx(){if(T.ph=='prep'){T.ph='work';T.i=1}else if(T.ph=='work'){if(T.i>=T.r){T.ph='done';T.run=0;bp(440,.5,3);upd();return}if(T.s)T.ph='rest';else T.i++}else{T.ph='work';T.i++}T.w10=0;T.end=Date.now()+(T.ph=='work'?T.w:T.s)*1000;bp(T.ph=='work'?880:520,.5);upd()}
+function ts(){if(T.run){T.left=T.end-Date.now();T.run=0}else{if(T.ph=='idle'||T.ph=='done'){T.ph='prep';T.i=1;T.left=10000;T.w10=0}T.end=Date.now()+T.left;T.run=1;ac()}upd()}
+setInterval(()=>{if(!T.run)return;const l=T.end-Date.now();if(l<=0)nx();else{if(T.ph=='work'&&l<=10500&&!T.w10&&T.w>20){T.w10=1;bp(660,.15,2)}upd()}},200);
+function pre(i){T.r=PR[i][1];T.w=PR[i][2];T.s=PR[i][3];T.run=0;T.ph='idle';render()}
+function upd(){const e=$('#tm');if(!e)return;const ms=T.run?T.end-Date.now():T.ph=='idle'?T.w*1000:T.left,s=Math.max(0,Math.ceil(ms/1000));e.textContent=pad(Math.floor(s/60))+':'+pad(s%60);$('#ph').textContent={idle:'Ready',prep:'Get ready',work:'Fight!',rest:'Rest',done:'Done 🔔'}[T.ph];$('#rd').textContent=T.ph=='idle'?T.r+' rounds':'Round '+T.i+' / '+T.r;$('#tb').className='tb '+T.ph;$('#go').textContent=T.run?'Pause':'Start'}
+function vProg(){const n=today(),mon=addD(n,-((n.getDay()+6)%7));let wk=0,mo=0,cl=0;
+ for(let i=0;i<30;i++){const dt=addD(n,-i),k=key(dt),c=plan(dt).filter((p,j)=>p.tr&&S.done[k+'|'+j]).length;mo+=c;cl+=plan(dt).filter((p,j)=>p.cl&&S.done[k+'|'+j]).length;if(dt>=mon)wk+=c}
+ const w=S.wt,d=w.length>1?(w[w.length-1].kg-w[0].kg).toFixed(1):null;
+ return`<h2>Progress</h2><div class="big"><div><b>${wk}/${ME().days||5}</b><span>sessions this week</span></div><div><b>${mo}</b><span>sessions, last 30 days</span></div></div>
+ <h2>Club budget</h2><div class="fs" style="grid-template-columns:1fr 1fr"><div><label>Club sessions per week</label><input type="number" min="0" max="5" value="${S.cfg.club}" onchange="S.cfg.club=Math.min(5,Math.max(0,+this.value||0));save();render()"></div><div><label>Price per session (₽)</label><input type="number" value="${S.cfg.price||''}" onchange="S.cfg.price=+this.value||0;save();render()"></div></div><p style="color:var(--mut)">Planned: ${S.cfg.club} per week${S.cfg.price?' = '+S.cfg.club*S.cfg.price+' ₽':''}<br>Attended, last 30 days: ${cl}${S.cfg.price?' = '+cl*S.cfg.price+' ₽':''}</p><h2>Body weight</h2><div class="row"><input type="number" step="0.1" id="kg" placeholder="kg" style="flex:1"><button class="btn" onclick="aw()">Add</button></div>
+ <p style="color:var(--mut)">${w.length?w.slice(-6).reverse().map(x=>x.d.slice(5)+': '+x.kg+' kg').join(' · ')+(d!==null?'<br>Change since first entry: '+(d>0?'+':'')+d+' kg':''):'Weigh yourself in the morning, same conditions each time.'}</p>
+ <h2>Boxing bag checklist</h2>${KIT.map((k,i)=>`<label class="kit"><input type="checkbox" ${S.kit[i]?'checked':''} onchange="S.kit[${i}]=this.checked;save()">${k}</label>`).join('')}
+ <h2>App version</h2><p style="color:var(--mut)">Version ${VER}. The app checks for updates each time you open it.</p><button class="btn g" onclick="location.replace(location.pathname+'?r='+Date.now())">Reload latest version</button><h2>Shift calendar</h2><button class="btn g" onclick="if(confirm('Remove all manual shift edits?')){S.ov={};save();render()}">Reset my edits</button>`}
+const SHM=[['rope','jab'],['run','push','pull']],AMM=[null,['run'],['squat','push'],['run','rope'],['pull','squat'],['run','jab'],['rope','jab']];
+const TIPS=['Breathe out sharply on every punch.','Chin down, hands up, even when tired.','Sleep is when you get faster. Protect it.','Stop a set when the form gets sloppy.','Drink water before you feel thirsty.','Relax your shoulders. Tension makes you slow.','Move your feet first, then your hands.','Punch with your whole body, not just the arm.','Warm up 8 minutes before every session.','Stretch after training, not before heavy work.'];
+const SEG=[[0,1],[1,2],[1,3],[3,4],[1,5],[5,6],[2,7],[7,8],[2,9],[9,10]];
+function fig(P,dur,ex){const Q=P.map(q=>q.split(' ').map(Number)),Z=[...Q,Q[0]],an=(a,j,c)=>`<animate attributeName="${a}" values="${Z.map(q=>q[j*2+c]).join(';')}" dur="${dur}s" repeatCount="indefinite"/>`;
+ return`<svg viewBox="0 0 100 100" class="fg">${ex||''}<line x1="4" y1="92" x2="96" y2="92" style="stroke:var(--line)" stroke-width="2"/>`+SEG.map(([a,b])=>`<line x1="${Q[0][a*2]}" y1="${Q[0][a*2+1]}" x2="${Q[0][b*2]}" y2="${Q[0][b*2+1]}" style="stroke:var(--acc)" stroke-width="4" stroke-linecap="round">${an('x1',a,0)}${an('y1',a,1)}${an('x2',b,0)}${an('y2',b,1)}</line>`).join('')+`<circle r="7" style="fill:var(--ink)" cx="${Q[0][0]}" cy="${Q[0][1]}">${an('cx',0,0)}${an('cy',0,1)}</circle></svg>`}
+const RP='<path d="M34 54 Q46 104 58 54" fill="none" style="stroke:var(--mut)" stroke-width="1.5"/>',BR='<line x1="26" y1="14" x2="66" y2="14" style="stroke:var(--mut)" stroke-width="3"/>',G="44 17 44 30 42 55 52 40 56 30 48 42 54 32 50 74 56 92 36 74 30 92";
+const MV={
+jab:{n:'Jab–cross',e:'🥊',w:'Speed, balance and the base of every combination.',s:['Stand sideways, feet shoulder-width, knees soft, hands at the chin','Jab: shoot the lead hand straight out, turn the fist over, snap it back','Cross: push off the back foot, turn hip and shoulder, return to guard'],m:'Dropping the other hand or leaning past the front knee.',d:'3–6 rounds × 3 min, 1 min rest',q:'jab cross shadowboxing technique',t:2.4,p:[G,"46 17 46 30 42 55 60 31 76 30 48 42 54 32 50 74 56 92 36 74 30 92",G,"48 18 50 30 44 55 56 40 58 30 62 32 78 30 50 74 56 92 38 74 32 92"]},
+slip:{n:'Slip and roll',e:'🛡️',w:'Defence: make punches miss, then counter.',s:['Keep your guard up and eyes on the opponent','Bend the knees and drop the head off the centre line','Come back up to guard and throw a counter'],m:'Bending at the waist instead of the knees.',d:'3 rounds × 3 min, slow and relaxed',q:'boxing slip and roll head movement drill',t:2,p:[G,"36 28 42 40 42 60 50 48 52 40 46 50 50 42 48 76 56 92 36 76 30 92",G]},
+rope:{n:'Jump rope',e:'🪢',w:'Footwork, rhythm and endurance.',s:['Elbows close, wrists turn the rope','Small jumps on the balls of the feet','Keep a steady beat, breathe through the nose'],m:'Jumping too high and landing on flat feet.',d:'5–6 rounds × 3 min, 30–60 s rest',q:'jump rope boxing basics',t:.6,x:RP,p:["46 17 46 30 46 55 40 42 34 54 52 42 58 54 47 74 47 92 45 74 45 92","46 9 46 22 46 47 40 36 34 50 52 36 58 50 47 66 47 82 45 66 45 82"]},
+squat:{n:'Bodyweight squat',e:'🦵',w:'Leg power for footwork and punching.',s:['Feet shoulder-width, chest up','Sit back and down until thighs are parallel','Push through the whole foot and stand tall'],m:'Knees caving in or heels lifting.',d:'4 × 15, 45 s rest',q:'bodyweight squat form',t:2.6,p:["46 15 46 28 46 54 52 38 58 36 52 38 58 36 47 73 47 92 45 73 45 92","58 32 56 44 38 68 62 50 74 46 62 50 74 46 62 70 56 92 60 70 50 92"]},
+push:{n:'Push-up',e:'💪',w:'Chest, shoulders and triceps: the power behind your punches.',s:['Hands under the shoulders, body in one straight line','Lower until the chest is a fist from the floor','Press up without sagging the hips'],m:'Sagging hips or flaring elbows.',d:'4 × 10–15, 60 s rest',q:'perfect push up form',t:1.8,p:["76 48 64 56 40 70 64 72 64 88 60 72 60 88 24 79 8 88 22 79 6 88","76 74 64 78 40 82 54 84 64 88 50 84 60 88 24 85 8 88 22 85 6 88"]},
+pull:{n:'Pull-up',e:'🧗',w:'Back and arms for pulling, clinching and guard strength.',s:['Hang with hands just wider than the shoulders','Pull the elbows down until the chin passes the bar','Lower slowly to a full hang'],m:'Swinging and half reps.',d:'4 × 5–8, 90 s rest. No bar: backpack rows',q:'pull up form beginners',t:2.4,x:BR,p:["46 28 46 38 46 62 41 26 40 14 51 26 52 14 46 76 46 88 44 76 44 88","46 9 46 22 46 46 36 22 40 14 56 22 52 14 46 60 40 72 44 60 38 72"]},
+run:{n:'Run and sprints',e:'🏃',w:'The engine for 3-minute rounds.',s:['Stay tall, relax the shoulders','Arms swing forward and back, not across','Easy runs: you can still talk. Sprints: all out'],m:'Starting too fast and overstriding.',d:'Easy 30–40 min, or 8 × 30 s sprints',q:'running technique for boxers',t:.6,p:["48 17 47 30 44 55 38 42 34 52 56 40 62 32 56 62 50 76 40 76 32 90","48 17 47 30 44 55 56 40 62 32 38 42 34 52 40 76 32 90 56 62 50 76"]}};
+const ME=()=>S.me||{},sm=(k,v)=>{S.me=S.me||{};S.me[k]=v;save()};
+let OM={},CB='';const om=k=>{OM[k]=!OM[k];render()};
+function mvCard(id){const m=MV[id],sp=ME().st=='s';return`<div class="mc"><div style="${sp?'transform:scaleX(-1)':''}">${fig(m.p,m.t,m.x)}</div><b>${m.e} ${m.n}</b><p style="margin:2px 0;color:var(--mut)">${m.w}</p><ol>${m.s.map(x=>`<li>${x}</li>`).join('')}</ol><p style="margin:2px 0">⚠️ ${m.m}</p><p style="margin:2px 0">⏱️ ${m.d}</p><a class="chip" style="display:inline-block;margin-top:8px;text-decoration:none;color:var(--ink)" target="_blank" rel="noopener" href="https://www.youtube.com/results?search_query=${encodeURIComponent(m.q)}">▶ Watch video</a></div>`}
+const vMoves=()=>`<h1>Moves</h1><p style="color:var(--mut)">Animated guides for your sessions. Southpaw? Set your stance in Me and the figures mirror.</p><div class="mc"><b>🎲 Combo generator</b><p style="font:800 28px system-ui;margin:6px 0">${CB||'Tap the button'}</p><p style="color:var(--mut);margin:0 0 8px">1 jab · 2 cross · 3 lead hook · 4 rear hook · 5 lead uppercut · 6 rear uppercut</p><button class="btn" onclick="CB=Array.from({length:3+Math.floor(Math.random()*3)},()=>1+Math.floor(Math.random()*6)).join(' – ');render()">New combo</button></div>${Object.keys(MV).map(mvCard).join('')}`;
+const CLS=[48,51,54,57,60,63.5,67,71,75,80,86,92];
+function plan(d){const L=plan0(d),m=ME(),r={b:3,a:6}[m.lv]||5;
+ L.forEach(p=>{p.x=p.x.replace('shadowboxing 5 × 3','shadowboxing '+r+' × 3');if(m.eq&&m.eq.bag&&p.x.startsWith('Technique at home'))p.x+=' + heavy bag 4 × 3 min';if(m.eq&&!m.eq.bar)p.x=p.x.replace('3 × 8 pull-ups','3 × 12 backpack rows')});return L}
+function vMe(){const m=ME(),eq=m.eq||{},sel=(k,o)=>`<select onchange="sm('${k}',this.value);render()">${o.map(([v,l])=>`<option value="${v}"${(m[k]||'')==v?' selected':''}>${l}</option>`).join('')}</select>`,inp=(k,l,t,ph)=>`<label>${l}</label><input type="${t||'number'}" ${(t||'number')=='number'?'inputmode="decimal"':''} value="${m[k]||''}" placeholder="${ph||''}" onchange="sm('${k}',this.value);render()">`;
+ const cls=m.kg?(CLS.find(c=>c>=+m.kg)||'92+'):null,left=m.fd?Math.ceil((new Date(m.fd+'T00:00')-today())/864e5):null;
+ return`<h1>${m.name?'Hi, '+m.name:'Tell me about you'}</h1><p style="color:var(--mut)">Your answers shape the plan. They stay on this phone.</p><div class="frm">${inp('name','Name','text')}${inp('age','Age')}${inp('cm','Height (cm)')}${inp('kg','Weight (kg)')}
+ <label>Main goal</label>${sel('goal',[['','Choose…'],['fight','Compete in fights'],['shape','Fighting shape'],['lose','Lose weight'],['strong','Get stronger']])}
+ <label>Boxing experience</label>${sel('lv',[['','Choose…'],['b','Beginner'],['i','Some experience'],['a','Experienced']])}
+ <label>Stance</label>${sel('st',[['','Not sure'],['o','Orthodox (left hand leads)'],['s','Southpaw (right hand leads)']])}
+ <label>Equipment at home</label>${[['rope','Jump rope'],['bag','Heavy bag'],['db','Dumbbells'],['band','Bands'],['bar','Pull-up bar']].map(([k,l])=>`<label class="kit"><input type="checkbox" ${eq[k]?'checked':''} onchange="S.me=S.me||{};S.me.eq=S.me.eq||{};S.me.eq['${k}']=this.checked;save()">${l}</label>`).join('')}
+ ${inp('hurt','Injuries or pain to protect','text','e.g. right wrist')}${inp('sleep','Usual sleep (hours)')}${inp('days','Training days per week','number','5')}${inp('fn','Next fight or tournament','text','name')}${inp('fd','Date','date')}</div>
+ ${cls||(left!=null&&left>=0)?`<div class="big" style="margin-top:14px">${cls?`<div><b>${cls}</b><span>weight class, kg</span></div>`:''}${left!=null&&left>=0?`<div><b>${left}</b><span>days to ${m.fn||'the fight'}</span></div>`:''}</div>`:''}`}
+function render(){const m=$('#main'),st=m.scrollTop;m.innerHTML={today:vToday,cal:vCal,moves:vMoves,timer:vTimer,prog:()=>vMe()+vProg()}[tab]();m.scrollTop=st;upd();
+ $('#nav').innerHTML=[['today','🏠','Today'],['cal','🗓️','Calendar'],['moves','🎬','Moves'],['timer','⏱️','Timer'],['prog','👤','Me']].map(([k,e,l])=>`<button class="${tab==k?'on':''}" onclick="go('${k}')"><b>${e}</b>${l}</button>`).join('')}
+const go=k=>{tab=k;$('#main').scrollTop=0;render()},mv=n=>{sel=addD(sel,n);render()},tg=k=>{S.done[k]=!S.done[k];save();render()};
+function cmv(n){cm.m+=n;if(cm.m<0){cm.m=11;cm.y--}if(cm.m>11){cm.m=0;cm.y++}render()}
+function pick(y,m,d){const dt=new Date(y,m,d);if(edit){const o=['D','N','O','V'];S.ov[key(dt)]=o[(o.indexOf(type(dt))+1)%4];save();render()}else{sel=dt;go('today')}}
+function aw(){const v=parseFloat($('#kg').value);if(!v)return;const k=key(today());S.wt=S.wt.filter(x=>x.d!=k);S.wt.push({d:k,kg:v});S.wt.sort((a,b)=>a.d<b.d?-1:1);save();render()}
 render();
-</script>
-</body>
-</html>
+fetch('index.html?'+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{const m=t.match(/const VER=(\d+)/);if(m&&+m[1]>VER&&!location.search.includes('v='+m[1]))location.replace(location.pathname+'?v='+m[1])}).catch(()=>{});
+</script></body></html>
