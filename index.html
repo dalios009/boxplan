@@ -45,7 +45,7 @@ input[type=date]{-webkit-appearance:none;appearance:none;display:block;min-width
 input[type=date]::-webkit-date-and-time-value{text-align:left}
 </style></head><body><div id="app"><main id="main"></main><nav id="nav"></nav></div>
 <script>
-const VER=4;
+const VER=5;
 const $=s=>document.querySelector(s),pad=n=>String(n).padStart(2,'0');
 let S={};try{S=JSON.parse(localStorage.getItem('bp')||'{}')}catch(e){}
 S.ov=S.ov||{};S.done=S.done||{};S.wt=S.wt||[];S.kit=S.kit||{};S.cfg=S.cfg||{club:2,price:0};
@@ -60,28 +60,26 @@ function base(d){const k=key(d);if(k>='2026-10-15'&&k<='2026-10-28')return'V';
  return'O'}
 const type=d=>S.ov[key(d)]||base(d);
 const M={D:['☀️','Day shift','09:00 – 21:00'],N:['🌙','Night shift','21:00 – 09:00'],O:['💤','Day off','Heavy training day'],V:['🏖️','Vacation','Training camp']};
-const S1=[['19:30','Спорт-группа, Fedoseev']],CL=[[['12:00','Общая группа, Merkulov']],S1,S1,S1,[S1[0],['19:30','Проф-бокс, Osipov']],S1,[['12:00','Проф-бокс, Osipov']]];
+const BX=[['20:40','Бокс, Alatar Team']],CL=[[],[],BX,[],BX,[],[['15:00','Бокс, Alatar Team']]];
 const AM=['Active recovery: 30 min walk + 20 min stretching','Easy run 35–40 min + 10 min core (plank, leg raises)','Strength A, 45 min: squats, push-ups, rows, lunges, plank. 4 rounds','Intervals: 8 × (30 s sprint / 90 s walk), then rope 5 × 3 min','Strength B, 45 min: deadlifts, pull-ups, med-ball slams, core','Tempo run 25 min + shadowboxing 4 × 3 min','Rope 3 × 3 min + shadowboxing 3 × 3 min + mobility'];
 const SH=['Rope 5 × 3 min + shadowboxing 3 × 3 min + core 5 min','Easy run 25 min + 3 × 15 push-ups + 3 × 8 pull-ups'];
 const H=['💧 2.5 L water','🥩 Protein in every meal','🧘 10 min stretching','😴 Sleep 7 h or more'];
 const KIT=['Gloves 12–16 oz','Hand wraps','Mouthguard','Jump rope','Boxing shoes','Headgear (for sparring)','Medical certificate (справка)','Towel, shower kit, flip-flops, clean clothes','Water bottle'];
 const NS='Shadowboxing 4 × 3 min + rope 3 × 3 min + bodyweight circuit',TECH='Technique at home, 30 min: shadowboxing 5 × 3 min (jab–cross, footwork, defence)';
 const fm=m=>pad(Math.floor(m/60)%24)+':'+pad(m%60),tm=s=>+s.slice(0,2)*60+ +s.slice(3);
-const PREF=[4,6,2,1,3,5,0];
-function clubOn(d){const w=d.getDay(),mon=addD(d,-((w+6)%7)),c=[];
- for(let i=0;i<7;i++){const x=addD(mon,i),t=type(x),wd=x.getDay();if((t=='O'||t=='V')&&!(type(addD(x,-1))=='N'&&CL[wd][0][0]<'15'))c.push(wd)}
- c.sort((a,b)=>PREF.indexOf(a)-PREF.indexOf(b));return c.slice(0,S.cfg.club).includes(w)}
+const el=x=>{const w=x.getDay(),t=type(x);if(!CL[w].length)return false;if(t=='O'||t=='V')return true;return w==6&&t=='N'&&type(addD(x,-1))!='N'};
+function clubOn(d){const st=new Date((S.cfg.start||'2026-10-15')+'T00:00'),n=Math.round((d-st)/864e5);if(n<0||n>29||!el(d))return false;let c=0;for(let i=0;i<n;i++)if(el(addD(st,i)))c++;return c<12}
 function plan0(d){const t=type(d),w=d.getDay(),pv=type(addD(d,-1))=='N',nx=type(addD(d,1)),L=[],a=(t,i,x,tr,cl,mv)=>L.push({t,i,x,tr,cl,mv});
- const cb=()=>{const s=tm(CL[w][0][0]),nm=CL[w].map(c=>c[1]).join(' / ');a(fm(s-150),'🍌','Light meal 2 h before: rice or pasta + banana');a(fm(s-75),'🚌','Leave home (1 h to the club). Bag: gloves, wraps, mouthguard, towel, shower kit, clean clothes');a(fm(s),'🥊',nm+', about 90 min',1,1);a(fm(s+90),'🚿','Shower and change at the club (about 20 min)');a(fm(s+110),'🚌','Travel home (1 h), protein meal when you arrive')};
+ const cb=()=>{const s=tm(CL[w][0][0]);a(fm(s-150),'🍌','Light meal 2 h before: rice or pasta + banana');a(fm(s-45),'🚌','Leave home (30 min to the gym). Bag: gloves, wraps, mouthguard, towel, shower kit, clean clothes');a(fm(s),'🥊',CL[w][0][1]+', about 90 min',1,1);a(fm(s+90),'🚿','Shower and change at the gym (about 20 min)');a(fm(s+110),'🚌','Travel home (30 min), protein meal when you arrive')};
  if(t=='D'){a('05:45','⏰','Wake up, 500 ml water, light breakfast');a('06:00','🏃',SH[d.getDate()%2]+' (40 min)',1,0,SHM[d.getDate()%2]);a('06:50','🚿','Shower at home, get ready');a('07:45','🚌','Leave home (1 h to work)');a('13:00','🍽️','Mid-shift meal: protein + carbs, nothing heavy or fried');a('21:00','🏁','Shift ends. Travel home (1 h)');a('22:10','🧘','Dinner + 10 min stretching');a(nx=='D'?'22:45':'23:30','😴',nx=='D'?'Lights out, early start tomorrow':'Lights out, 7+ hours of sleep')}
- else if(t=='N'){if(pv){a('09:00','🏁','Shift ends. Travel home (1 h)');a('10:15','😴','Light meal, shower, sleep 10:45–17:00 in a dark room');a('17:15','🥊',NS+' (40 min, moderate)',1,0,['jab','slip','rope']);a('18:15','🚿','Shower, then main meal')}else{a('13:30','😴','Nap 90 min to prepare for the night');a('16:00','🥊',NS+' (40 min, moderate)',1,0,['jab','slip','rope']);a('16:50','🚿','Shower, then main meal')}a('19:45','🚌','Leave home (1 h to work). Pack water, fruit, nuts, protein bar');a('01:00','🥜','Night snack: banana, nuts or yogurt. No caffeine after 03:00')}
+ else if(t=='N'){if(pv){a('09:00','🏁','Shift ends. Travel home (1 h)');a('10:15','😴','Light meal, shower, sleep 10:45–17:00 in a dark room');a('17:15','🥊',NS+' (40 min, moderate)',1,0,['jab','slip','rope']);a('18:15','🚿','Shower, then main meal')}else if(clubOn(d)){cb();a('17:35','😴','Nap 90 min: you start work at 21:00')}else{a('13:30','😴','Nap 90 min to prepare for the night');a('16:00','🥊',NS+' (40 min, moderate)',1,0,['jab','slip','rope']);a('16:50','🚿','Shower, then main meal')}a('19:45','🚌','Leave home (1 h to work). Pack water, fruit, nuts, protein bar');a('01:00','🥜','Night snack: banana, nuts or yogurt. No caffeine after 03:00')}
  else{const club=clubOn(d);
   if(pv)a('09:30','😴','Sleep 10:00–16:00. Recovery comes first');
   else{a(t=='V'?'07:30':'08:00','🏃',AM[w]+(club?'. Keep it easy, club today':''),w!=0,0,AMM[w]);a('09:30','🚿','Shower, breakfast: protein + carbs')}
   if(club)cb();
   else if(w==0&&!pv)a('17:30','🧘','Rest day: 30 min walk, stretching, meal prep');
   else a('17:30','🥊',pv?'Light home session: shadowboxing 3 × 3 min + rope 3 × 3 min + mobility':TECH,1,0,['jab','slip']);
-  if(nx=='N')a('23:59','😴','Night shift tomorrow: go to bed late (00:30) and sleep in');
+  if(club&&nx=='D')a('23:30','😴','Sleep right away: short night before the day shift');else if(nx=='N')a('23:59','😴','Night shift tomorrow: go to bed late (00:30) and sleep in');
   else a(nx=='D'?'22:30':'23:30','😴',nx=='D'?'In bed by 22:30, early start tomorrow':'Lights out, 7+ hours of sleep')}
  return L}
 const today=()=>{const n=new Date();return new Date(n.getFullYear(),n.getMonth(),n.getDate())};
@@ -112,11 +110,11 @@ function ts(){if(T.run){T.left=T.end-Date.now();T.run=0}else{if(T.ph=='idle'||T.
 setInterval(()=>{if(!T.run)return;const l=T.end-Date.now();if(l<=0)nx();else{if(T.ph=='work'&&l<=10500&&!T.w10&&T.w>20){T.w10=1;bp(660,.15,2)}upd()}},200);
 function pre(i){T.r=PR[i][1];T.w=PR[i][2];T.s=PR[i][3];T.run=0;T.ph='idle';render()}
 function upd(){const e=$('#tm');if(!e)return;const ms=T.run?T.end-Date.now():T.ph=='idle'?T.w*1000:T.left,s=Math.max(0,Math.ceil(ms/1000));e.textContent=pad(Math.floor(s/60))+':'+pad(s%60);$('#ph').textContent={idle:'Ready',prep:'Get ready',work:'Fight!',rest:'Rest',done:'Done 🔔'}[T.ph];$('#rd').textContent=T.ph=='idle'?T.r+' rounds':'Round '+T.i+' / '+T.r;$('#tb').className='tb '+T.ph;$('#go').textContent=T.run?'Pause':'Start'}
-function vProg(){const n=today(),mon=addD(n,-((n.getDay()+6)%7));let wk=0,mo=0,cl=0;
+function vProg(){const n=today(),mon=addD(n,-((n.getDay()+6)%7));let wk=0,mo=0,cl=0,cu=0;const st=new Date((S.cfg.start||'2026-10-15')+'T00:00'),en=addD(st,29);for(let i=0;i<30;i++){const dt=addD(st,i),k=key(dt);cu+=plan(dt).filter(p=>p.cl&&S.done[k+'|'+p.id]).length}
  for(let i=0;i<30;i++){const dt=addD(n,-i),k=key(dt),c=plan(dt).filter((p,j)=>p.tr&&S.done[k+'|'+p.id]).length?1:0;mo+=c;cl+=plan(dt).filter((p,j)=>p.cl&&S.done[k+'|'+p.id]).length;if(dt>=mon)wk+=c}
  const w=S.wt,d=w.length>1?(w[w.length-1].kg-w[0].kg).toFixed(1):null;
  return`<h2>Progress</h2><div class="big"><div><b>${wk}/${ME().days||5}</b><span>training days this week</span></div><div><b>${mo}</b><span>training days, last 30 days</span></div></div>
- <h2>Club budget</h2><div class="fs" style="grid-template-columns:1fr 1fr"><div><label>Club sessions per week</label><input type="number" min="0" max="5" value="${S.cfg.club}" onchange="S.cfg.club=Math.min(5,Math.max(0,+this.value||0));save();render()"></div><div><label>Price per session (₽)</label><input type="number" value="${S.cfg.price||''}" onchange="S.cfg.price=+this.value||0;save();render()"></div></div><p style="color:var(--mut)">Planned: ${S.cfg.club} per week${S.cfg.price?' = '+S.cfg.club*S.cfg.price+' ₽':''}<br>Attended, last 30 days: ${cl}${S.cfg.price?' = '+cl*S.cfg.price+' ₽':''}</p><h2>Body weight</h2><div class="row"><input type="number" step="0.1" id="kg" placeholder="kg" style="flex:1"><button class="btn" onclick="aw()">Add</button></div>
+ <h2>Club subscription</h2><div class="fs" style="grid-template-columns:1fr 1fr"><div><label>First day (30 days)</label><input type="date" value="${S.cfg.start||'2026-10-15'}" onchange="S.cfg.start=this.value;save();render()"></div><div><label>Price (₽)</label><input type="number" value="${S.cfg.price||4000}" onchange="S.cfg.price=+this.value||0;save();render()"></div></div><div class="big"><div><b>${cu}/12</b><span>classes attended</span></div><div><b>${Math.max(0,12-cu)}</b><span>left, ends ${en.toLocaleDateString('en-GB',{day:'numeric',month:'short'})}</span></div></div><p style="color:var(--mut)">${cu?Math.round((S.cfg.price||4000)/cu)+' ₽ per class so far.':'Tick the Club items in Today to count your classes.'}</p><h2>Body weight</h2><div class="row"><input type="number" step="0.1" id="kg" placeholder="kg" style="flex:1"><button class="btn" onclick="aw()">Add</button></div>
  <p style="color:var(--mut)">${w.length?w.slice(-6).reverse().map(x=>x.d.slice(5)+': '+x.kg+' kg').join(' · ')+(d!==null?'<br>Change since first entry: '+(d>0?'+':'')+d+' kg':''):'Weigh yourself in the morning, same conditions each time.'}</p>
  <h2>Boxing bag checklist</h2>${KIT.map((k,i)=>`<label class="kit"><input type="checkbox" ${S.kit[i]?'checked':''} onchange="S.kit[${i}]=this.checked;save()">${k}</label>`).join('')}
  <h2>App version</h2><p style="color:var(--mut)">Version ${VER}. The app checks for updates each time you open it.</p><button class="btn g" onclick="location.replace(location.pathname+'?r='+Date.now())">Reload latest version</button><h2>Shift calendar</h2><button class="btn g" onclick="if(confirm('Remove all manual shift edits?')){S.ov={};save();render()}">Reset my edits</button>`}
